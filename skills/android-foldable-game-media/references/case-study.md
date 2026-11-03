@@ -2,8 +2,8 @@
 
 | Campo | Valor |
 |---|---|
-| Versión del informe | 1.1 |
-| Corte de evidencia | 2026-11-01 |
+| Versión del informe | 1.2 |
+| Corte de evidencia | 2026-11-02 |
 | Dispositivo de referencia | HONOR Magic V2, panel interior desplegado salvo que se indique otra cosa |
 | Repositorio | [`elysium-vanguard-android-adaptive-engineering`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering) |
 
@@ -11,7 +11,7 @@ Este es un informe técnico con estructura científica y pasos de reproducción.
 
 ## Resumen
 
-Nueve grupos reúnen el trabajo pedido en un HONOR Magic V2: adaptar un port Winlator de *Resident Evil 7*; investigar cierre, driver, FPS y controles de *Halo 2*; ajustar *Sekiro*; buscar rendimiento estable en *Left 4 Dead 2*; adaptar el port Android de *Need for Speed: Most Wanted* (2012); ubicar datos de *Just Cause 2*; construir un clon separado de *PES 6*, importar una ISO europea y probar una adaptación de pantalla y tacto; adaptar el escalado de video de un clon de YouTube; y analizar tareas de USB/almacenamiento relacionadas con *PES 2017* y *Zelda: Breath of the Wild*. El repositorio conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
+La primera edición reunió nueve grupos de trabajo en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión agrega los seguimientos de rendimiento de RE7 y *God of War III*, el diseño pendiente de *BOTW Recompiled*, la prueba de reproducción de fondo de YouTube y el caso verificado de pantalla completa de *Gears of War* en un port Android derivado de Xenia. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
 
 El hallazgo geométrico principal es que “pantalla completa” depende de la ventana y superficie activas. En una lectura del clon de YouTube, la actividad ocupaba `2156×2344`, mientras que `SurfaceView` medía `2156×1212` (16:9). La app podía estar a pantalla completa y aun así conservar un video apaisado con bandas arriba y abajo. Para mostrar el video completo sin deformarlo, el modo debe conservar aspecto y aceptar espacio libre; para llenar el área con `zoom` se recorta el cuadro, y `stretch` lo deforma.
 
@@ -69,6 +69,10 @@ El recorte centrado en un juego también exige transformar las coordenadas táct
 | PES 6 | Clon separado instalado; ISO europea aceptada y copiada; el port llegó a escena 8 | El usuario reportó que quedó; la captura tras el parche aún mostraba bandas en selección de idioma y ADB quedó offline antes de confirmar los hooks y el táctil |
 | YouTube | Clon `bill.youtube` construido, instalado y abierto | Botón de escala requirió reinicio; modo elegido y cobertura de todos los tipos de video no confirmados |
 | USB / almacenamiento | Se pidió resetear un USB para PC, limpiar PES y revisar cachés/“Otros” | El sistema de archivos del USB y el espacio realmente liberado no quedaron en una medición final reproducible |
+| Gears of War (port Xenia/ReX) | Capturas de título y gameplay llenaron el panel interior tras desactivar el letterbox del presentador; el usuario confirmó pantalla completa | Se usó `Stretch`: conserva el cuadro visible, pero deforma 16:9 al ratio medido del panel; no se probó un viewport/FOV cercano a 1.087:1 |
+| God of War III | Se revirtió un perfil de máximo rendimiento después de fallas reportadas en cinemáticas; más tarde el usuario reportó mejora con CPU all-core | No hay series de frametime, prueba controlada de causa ni evidencia de “100 %” de CPU/GPU o de Lossless generando cuadros |
+| BOTW Recompiled | Se aprobó el diseño conceptual de 60 FPS base y 120 FPS de salida interpolada | El trabajo se pausó para priorizar adaptación de pantalla; integración LSFG y 120 FPS de salida no están verificados |
+| YouTube en segundo plano | Se eligió un clon compatible basado en RVX 21.30.216 para probar controles de reproducción | El usuario informó que no aparecían controles en notificaciones; no quedó demostrada la reproducción ni la corrección de fondo |
 
 ### Caso 1 — *Resident Evil 7*: APK adaptativo y perfil de rendimiento
 
@@ -156,6 +160,54 @@ La ISO seleccionada fue *Pro Evolution Soccer 6 (Europe) (En,Fr,De,Es,It)*, de 1
 
 El APK actualizado se verificó con `apksigner`, mantuvo el mismo paquete/llave del clon, se instaló correctamente y abrió `NativeActivity`. El archivo `pes6.iso` persistió después de la actualización. Una captura tomada en la selección de idioma todavía mostraba bandas arriba y abajo. El usuario indicó luego “ya quedó”; ADB pasó a `offline` antes de leer los logs específicos del cargador o verificar el toque físico. Estado de evidencia: **actualización instalada y éxito reportado por el usuario; hook activo, pantalla 100 % y tacto final no verificados independientemente**. Para cerrar la reproducción se necesita una captura posterior en la misma escena y una prueba táctil en menú y gameplay.
 
+## Seguimientos y casos nuevos al 2026-11-02
+
+### Caso 10 — *Gears of War* (2006): letterbox del presentador nativo
+
+**Arquitectura y alcance:** clon Android `com.xport.gears_of_war.magicv2adaptive`, con un presentador Xenia/ReX dentro de `libgame.so`. El objetivo de la última sesión fue la pantalla interior desplegada del Magic V2. No se tocó el APK original.
+
+**Diagnóstico:** la actividad Android y la superficie ya cubrían la captura horizontal `2344×2156`, mientras el cuadro del juego 16:9 quedaba centrado con franjas negras arriba y abajo. Eso localizó el problema en el cvar de presentación, no en el modo inmersivo o en `wm size`. Una variable de entorno añadida sola no cambió la captura; el parser de este wrapper tenía prefijos/capitalización propios y la biblioteca inicializaba `present_letterbox` como activo en más de un valor predeterminado.
+
+**Cambio aplicado en esa build:** se cambiaron a falso los valores predeterminados de `present_letterbox` que usaba el binario y se mantuvieron los overrides específicos que el wrapper esperaba: `XPORT_SURFACE_SCALE=1.0`, `REX_PRESENT_LETTERBOX=false`, `XPORT_XENIA_CVARS_DEFAULTS=present_letterbox=false` y `XPORT_XENIA_CVARS=present_letterbox=false`. Las posiciones binarias no se publican como receta porque el hash exacto de `libgame.so` no se guardó. La reproducción debe buscar primero el cvar soportado o reconstruir desde fuente; los offsets de otro APK no son reutilizables.
+
+**Resultado:** el APK del clon se actualizó en sitio con la misma identidad de paquete y firma. Se capturó el título y después una escena real de gameplay; ambos llenaron la captura sin letterbox. El usuario confirmó que ya veía pantalla completa. Los saves se conservaron y se habían respaldado antes de actualizar.
+
+**Interpretación y límites:** el método efectivo fue `Stretch`. No se vieron bandas ni se recortaron los extremos del cuadro en esas capturas, pero la imagen 16:9 se deformó al ratio aproximado 1.087:1 del panel. No se amplió la cámara ni se generó contenido nuevo fuera del cuadro. Una captura mostró 27 FPS en un instante; no mide rendimiento estable. El tacto de todos los bordes tampoco quedó medido. La [guía específica](../../../docs/ports-recompilados-letterbox.md) separa este ajuste de un patch real de viewport/FOV.
+
+La documentación oficial de Xenia Canary confirma que `present_letterbox=false` estira el cuadro. Sus patches públicos para *Gears of War* ofrecen perfiles 16:10 y 21:9 con cambios de viewport/FOV; esos ratios no coinciden con el panel casi cuadrado de esta prueba. No deben aplicarse sin un patch calculado para la proporción medida y una verificación de menú, gameplay, HUD y cinemáticas.
+
+### Caso 11 — *God of War III* en Android: Lossless, estabilidad y CPU
+
+**Proyecto de referencia:** el usuario indicó el port [zFitness/gow3_android](https://github.com/zFitness/gow3_android) y pidió reparar su integración Lossless, compilar para el Magic V2 y medir el resultado. También pidió 1080p nativo, corrección persistente de texturas y más rendimiento.
+
+**Secuencia relevante:** después de un perfil de máximo rendimiento, el usuario informó errores en cinemáticas de acciones y pidió volver a la primera versión que solo incorporaba ajustes de Lossless. Más adelante pidió activar todos los núcleos de CPU y dijo que el rendimiento mejoró. Son reportes útiles para orientar experimentos, pero no demuestran que el perfil agresivo causara las fallas ni que el sistema llegara a 100 % de CPU/GPU. No se conservó una medición A/B, telemetría por núcleo, perfil binario final ni prueba concluyente de cuadros interpolados.
+
+**Regla aprendida:** conserva un perfil conocido como baseline antes de optimizar. Prueba las cinemáticas que fallaron además de un punto de gameplay interactivo. Añade un cambio cada vez (resolución, CPU scheduling, driver, cache de texturas o generación de cuadros), y revierte la última variable si reaparece el fallo. “Todos los núcleos disponibles” no implica que el juego pueda paralelizar todo el trabajo ni que la CPU deba informar 100 % de uso; un uso menor puede significar espera de GPU, sincronización o límites de un hilo.
+
+### Caso 12 — *Zelda: Breath of the Wild Recompiled*: meta 60→120
+
+El usuario describió una meta de 60 FPS renderizados por el juego y 120 FPS de salida con interpolación. Se revisó y aprobó un diseño, pero el usuario pausó esa línea para corregir pantalla completa en una app abierta. El registro no confirma que la integración de LSFG se implementara, compilara o funcionara dentro del APK. El usuario había visto momentos cercanos a 60, lo que no equivale a 60 FPS estables.
+
+**Regla aprendida:** documenta por separado FPS base del juego, tasa de salida interpolada, refresco activo del panel, lectura del HUD y límite configurado. La aprobación de diseño no es prueba de implementación; una sesión de captura no prueba que se generen cuadros válidos ni que la entrada responda como a 120 FPS nativos.
+
+### Caso 13 — YouTube RVX: reproducción en segundo plano
+
+Después del clon adaptativo anterior, el usuario eligió una base compatible RVX 21.30.216 para probar reproducción de fondo y controles de notificación. El usuario informó que no aparecieron controles de reproducir/pausar. El registro no demuestra que MediaSession, reproducción con la app cerrada, canal de notificación o permisos estuvieran configurados ni que se aplicara una corrección. Al repetir, verifica por separado patch de background playback, servicio/media session, permiso de notificaciones en Android, canal y aparición de controles después de salir del player. No infieras que el parche de escala de pantalla añade playback en segundo plano.
+
+### Seguimiento de *Resident Evil 7*: hangs, driver y límites
+
+El perfil histórico RE7 de este informe registraba V38 y un límite configurado de 70. Después se reportaron nuevos estados colgados; el usuario pidió probar el driver Adreno 27 R1, limitar a 120 FPS y mantener una configuración de pantalla de 120 Hz mediante un script de inicio de Termux. También solicitó acceso a todos los núcleos de CPU. El registro del proyecto no contiene el script final, una lectura posterior de `dumpsys display`, el log del renderer asociado al proceso ni una sesión comparativa que demuestre 120 FPS sostenidos o estabilidad. Por ello, conserva el caso V38/70 como histórico y trata 27 R1/120/core policy como experimento posterior que debe volver a identificarse y verificarse antes de reutilizarlo.
+
+La lectura de refresco del panel, el tope del renderer, el FPS real de gameplay y cualquier salida de LSFG son valores distintos. Reiniciar Termux o guardar un valor persistente en el sistema tampoco prueba que la app del juego lo reciba. Para un hang, conserva tombstone/logcat antes de cambiar renderer; no asignes causalidad a la temperatura o al driver sin evidencia del proceso.
+
+### Investigación propuesta de DLSS 5 en Android
+
+Se discutieron runtime binaries de Hugging Face y repositorios de terceros, pero el registro no contiene una descarga ni integración en RE7. No se debe describirlo como portado o probado. Para una futura investigación se necesitan licencia y procedencia verificables, arquitectura/ABI compatible con Android, API gráfica soportada por el driver del teléfono, una ruta real de inferencia e integración en el renderer, y medición en el mismo proceso. Cambiar hashes o copiar DLLs al APK no establece compatibilidad ni sustituye una implementación Android/ARM64. No añadas DLLs, pesos, binarios ni archivos de juego al repositorio.
+
+### Limpieza del Mac y almacenamiento
+
+El trabajo de almacenamiento pidió priorizar cachés y compilaciones antiguas. El método reutilizable es medir bytes realmente asignados, identificar qué herramienta generó cada artefacto y comprobar que haya una fuente reproducible antes de borrar. Un tamaño aparente muy grande puede ocupar pocos bloques; el tamaño del Finder no basta. No elimines proyectos, datos privados de apps, saves o la categoría “Otros” sin identificar los archivos concretos. El informe no registra una lista completa de rutas eliminadas ni un delta final de almacenamiento del Mac, por lo que no ofrece una receta de borrado específica.
+
 ## Receta reproducible del clon de YouTube
 
 Los comandos son una plantilla para una nueva copia autorizada; no redistribuyas el APK base, el clon firmado ni la llave. Fija las versiones y hashes para poder comparar. Revisa compatibilidad nuevamente antes de repetir porque los patches y builds cambian.
@@ -220,3 +272,5 @@ Los resultados son de un solo dispositivo y aplicaciones/builds específicos. No
 3. Morphe Desktop, [CLI documentation](https://github.com/MorpheApp/morphe-desktop/blob/main/docs/documentation.md).
 4. Anddea, [patch list and compatible YouTube versions](https://github.com/anddea/revanced-patches), incluido `Fullscreen video scale`.
 5. Repo Halo proporcionado por el usuario, [Ayanokoji989/Halo-2](https://github.com/Ayanokoji989/Halo-2).
+6. Xenia Canary, [opciones de presentación](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing) y [patches oficiales de relación de aspecto para Gears of War](https://github.com/xenia-canary/game-patches/blob/main/patches/4D5307D5%20-%20Gears%20of%20War.patch.toml).
+7. zFitness, [gow3_android](https://github.com/zFitness/gow3_android), proyecto upstream indicado por el usuario para el port de *God of War III*.

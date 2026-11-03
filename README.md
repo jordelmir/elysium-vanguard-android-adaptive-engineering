@@ -2,11 +2,12 @@
 
 Métodos reproducibles para diagnosticar y adaptar juegos, ports y reproductores de video en Android plegables. El equipo de referencia es el HONOR Magic V2, con prioridad en el panel interior desplegado.
 
-El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube modificado y tareas relacionadas con USB y almacenamiento. Distingue entre cambios configurados, APKs instalados, comportamiento medido y resultados reportados por el usuario.
+El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, *Gears of War* en un port Android derivado de Xenia, *God of War III*, *Zelda: Breath of the Wild Recompiled*, clones de YouTube y tareas relacionadas con USB y almacenamiento. Distingue entre cambios configurados, APKs instalados, comportamiento medido y resultados reportados por el usuario.
 
 ## Qué contiene
 
 - Un método de diagnóstico por capas para actividad, ventana, superficie, viewport, controles y contenido.
+- Una guía específica para puertos recompilados que colocan el letterbox dentro del presentador nativo, incluido el significado real de `present_letterbox=false`.
 - Procedimientos para crear clones Android firmados por separado, importar datos propios y preservar la app original.
 - Guías para mapear entrada táctil después de un cambio de escala o recorte.
 - Separación entre FPS del juego, límite configurado, refresco del panel y cuadros generados.
@@ -23,6 +24,7 @@ La adaptación de escala siempre tiene un costo cuando la imagen y el panel tien
 
 - [Informe técnico de casos y método reproducible](skills/android-foldable-game-media/references/case-study.md)
 - [Skill para agentes de IA](skills/android-foldable-game-media/SKILL.md)
+- [Guía de letterbox en ports Xenia/ReX](docs/ports-recompilados-letterbox.md)
 - [Arquitectura y diagnóstico de RE7](docs/arquitectura-y-diagnostico.md)
 - [Reproducción desde un APK propio](docs/reproduccion.md)
 - [Experimentos y evidencia de RE7](docs/resultados-y-evidencia.md)

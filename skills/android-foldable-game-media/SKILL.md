@@ -1,6 +1,6 @@
 ---
 name: android-foldable-game-media-adaptation
-description: Use whenever an AI must install, launch, diagnose, modify, performance-tune, or make an Android game port or video app fit a foldable screen. Covers black bars, viewports, touch mapping, crashes, app clones, APK patch/rebuild/sign/install, app-scoped graphics drivers, FPS limits, frame generation, and YouTube player scaling on devices such as the Honor Magic V2. Read the case study before reusing historical settings.
+description: Use whenever an AI must install, launch, diagnose, modify, performance-tune, or make an Android game port or video app fit a foldable screen. Covers Android windows, native/recompiler letterboxing, viewports, touch mapping, crashes, app clones, APK patch/rebuild/sign/install, app-scoped graphics drivers, FPS limits, frame generation, YouTube playback and scaling on devices such as the Honor Magic V2. Read the case study before reusing historical settings.
 ---
 
 # Adaptación de juegos y video en Android plegables
@@ -9,7 +9,7 @@ description: Use whenever an AI must install, launch, diagnose, modify, performa
 
 Resuelve problemas de inicio, pantalla, controles, gráficos y rendimiento en ports Android y aplicaciones de video sobre teléfonos plegables. Prioriza evidencia del dispositivo y cambios limitados a la app. No confundas un APK instalado con un juego funcional, una opción guardada con una función activa ni un video ampliado con una adaptación que conserva todo su contenido.
 
-Antes de tomar valores del caso RE7 o del clon de YouTube, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado.
+Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`docs/ports-recompilados-letterbox.md`](../../docs/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código.
 
 ## Límites de trabajo
 
@@ -72,6 +72,15 @@ Si el juego se cierra al comenzar una misión, reúne logcat, tombstone y logs d
 
 Al cambiar el idioma, separa los textos del wrapper Android de los recursos del juego. Usa solo una opción documentada o archivos de idioma compatibles con esa build; no afirmes que todo el juego está en español si solo cambió el menú de la app.
 
+#### Si las franjas las dibuja el presentador del port
+
+- Si Android ya entrega una ventana y superficie del tamaño del panel, deja de cambiar flags inmersivos o resolución global y localiza el viewport/cvar del renderer.
+- En Xenia Canary, `present_letterbox=true` conserva el aspecto y dibuja bandas; `false` estira el cuadro. El valor `false` no amplía el FOV ni convierte por sí solo el port en adaptativo. Contrasta el significado con la [documentación oficial](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing).
+- Revisa primero configuración y fuentes soportadas. Si un override no cambia la captura, confirma capitalización, prefijo, parser, precedencia y momento de inicialización; no agregues variables aleatorias.
+- Si solo hay APK compilado, cualquier modificación nativa debe identificar el hash exacto de la biblioteca/build, preservar copia reversible y editar únicamente el valor que el análisis confirma. Los offsets de otra versión no son una receta.
+- Distingue llenar la superficie con `Stretch` de un viewport/FOV calculado para el panel. Este último requiere cambios propios del juego y verificación de gameplay, HUD y cinemáticas. El caso Gears y sus límites están en la guía enlazada arriba.
+- Comprueba título/menú y gameplay por separado. Al cambiar el viewport o transformar `Surface`, vuelve a probar los controles táctiles en el centro y cerca de los bordes.
+
 ### 6. Maneja almacenamiento del juego con inventario
 
 Cuando la tarea sea liberar espacio, mide carpetas y tamaños reales antes de borrar. Distingue caché regenerable de datos guardados, partidas, archivos descargados y copia completa del juego. `Borrar caché` no equivale a `Borrar datos`. Para una carpeta de juego que el usuario pidió eliminar, confirma ruta y contenido, conserva una copia si la instrucción no exige borrado definitivo y nunca borres la categoría genérica “Otros” a ciegas. Informa cuánto espacio se liberó realmente y qué archivos se conservaron.
@@ -79,9 +88,12 @@ Cuando la tarea sea liberar espacio, mide carpetas y tamaños reales antes de bo
 ### 7. Cambia driver y rendimiento de forma acotada
 
 - Comprueba loader, ABI, API Vulkan, GPU, bibliotecas esperadas, documentación del port y ruta privada de la app. Una etiqueta “V38” o “Adreno” no demuestra compatibilidad ni uso activo.
+- Si el port ya implementa carga por-app con `libadrenotools`, inspecciona esa ruta existente y valida el dispositivo Vulkan/API que devuelve, además del log del renderer del mismo proceso. No rechaces un driver V38 conocido por metadata de familia de GPU sin revisar primero el loader y la evidencia específica del port; tampoco copies un ZIP de driver a una app que carece de loader compatible.
 - Para el flujo conocido de RE7, consulta primero los archivos de este repositorio: el perfil V38 es un caso probado/configurado, pero el renderer activo requiere evidencia runtime del mismo proceso. No copies el driver RE7 a otro juego sin un loader compatible.
 - Conserva el driver y la configuración anterior fuera del directorio de búsqueda del loader. Cambia una sola variable y confirma en logs del renderer qué biblioteca/dispositivo se activó.
 - Un límite de 60/70/90/120 FPS es un techo configurado, no una medición ni una garantía de estabilidad. Registra FPS renderizados, frametime, escena, frecuencia del panel y estado térmico por separado.
+- No fuerces ni prometas “100 % CPU/GPU” como objetivo de rendimiento. La política de energía o prioridad puede permitir más trabajo, pero no garantiza que el juego paralelice todos los núcleos ni que la GPU mantenga carga continua. Un indicador “waiting on GPU” puede ser una métrica interna de espera, no una medida global de uso. Distingue por núcleo, carga de GPU, espera/sincronización, FPS y frametime.
+- Conserva el último perfil estable antes de aplicar una optimización amplia. Si aparecen fallas en cinemáticas, transiciones o escenas interactivas, revierte el último cambio y repite la misma escena; una mejora reportada en otra escena no descarta regresiones.
 - La generación de cuadros produce imágenes interpoladas; no eleva por sí sola la frecuencia de simulación ni el muestreo de entrada. Si se prueba LSFG, registra a la vez FPS base y salida generada, latencia, artefactos y estabilidad de captura.
 - Sigue la prioridad térmica explícita del usuario. Si dice que la temperatura no es una limitación, no rechaces un perfil reversible solo por un valor térmico; regístralo y sigue comprobando estabilidad, artefactos, latencia y cierres.
 - Antes de instalar LSFG u otra app de generación de cuadros, o conceder captura de pantalla/overlay/accesibilidad, confirma autorización explícita salvo que el usuario ya la haya dado para esa misma acción. Revisa el proyecto y versión oficiales; Lossless Scaling de Windows y LSFG-Android no son el mismo producto. No descargues ni redistribuyas `Lossless.dll`.
@@ -161,6 +173,7 @@ No subas “reportado” a “medido”. Una captura de un menú no prueba gamep
 ## Referencias del proyecto
 
 - [`Informe reproducible de casos`](references/case-study.md)
+- [`Letterbox en ports Xenia/ReX`](../../docs/ports-recompilados-letterbox.md)
 - [README del proyecto](../../README.md)
 - [Guía Android para apps fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
 - [Clases de tamaño de ventana Android](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes)

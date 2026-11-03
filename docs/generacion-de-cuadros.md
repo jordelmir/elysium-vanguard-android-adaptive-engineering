@@ -22,6 +22,12 @@ La prueba de este caso no guardó una medición final simultánea del HUD DXVK y
 
 La documentación del proyecto upstream describe MediaProjection como ruta de captura y advierte latencia adicional. La versión 0.1.2 publicó correcciones de compatibilidad Vulkan, pantalla negra, estabilidad y transferencia de imagen. Los requisitos y limitaciones pueden cambiar; consulta la versión actual antes de repetir.
 
+## Incidente observado: captura virtual y superficie nativa
+
+En una prueba separada en el Magic V2, LSFG-Android inició una sesión de captura de una app individual, con multiplicador 2×, modo rendimiento y FP16. Eso solo demostró que la sesión arrancó. Algunas capturas de la pantalla virtual salieron negras o inválidas y se conservó un `SIGSEGV` en `ANativeWindow_setBuffersGeometry` dentro de `liblsfg-android.so`, asociado a la ruta de display virtual/captura. Reiniciar LSFG restauró la app de juego sin terminar su proceso. No se guardó una medición simultánea de FPS base y salida interpolada.
+
+Al investigar un resultado parecido, separa fallo de la app objetivo, fallo del capturador, orientación de la superficie, swapchain virtual y salida de frames. Reproduce la misma orientación, conserva logcat/tombstone y captura de la app; no describas “sesión activa” o “2× seleccionado” como frames generados estables.
+
 ## Consentimiento y privacidad
 
 MediaProjection requiere consentimiento de Android para cada sesión. No selecciones toda la pantalla si la intención es capturar solo el juego y Android ofrece seleccionar la app. Conserva activo el indicador del sistema y termina la sesión al acabar. No distribuyas DLL ni shaders extraídos.
