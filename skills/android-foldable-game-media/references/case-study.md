@@ -2,8 +2,8 @@
 
 | Campo | Valor |
 |---|---|
-| Versión del informe | 1.2 |
-| Corte de evidencia | 2026-11-02 |
+| Versión del informe | 1.3 |
+| Corte de evidencia | 2026-11-07 |
 | Dispositivo de referencia | HONOR Magic V2, panel interior desplegado salvo que se indique otra cosa |
 | Repositorio | [`elysium-vanguard-android-adaptive-engineering`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering) |
 
@@ -11,7 +11,7 @@ Este es un informe técnico con estructura científica y pasos de reproducción.
 
 ## Resumen
 
-La primera edición reunió nueve grupos de trabajo en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión agrega los seguimientos de rendimiento de RE7 y *God of War III*, el diseño pendiente de *BOTW Recompiled*, la prueba de reproducción de fondo de YouTube y el caso verificado de pantalla completa de *Gears of War* en un port Android derivado de Xenia. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
+La primera edición reunió trabajos en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión incorpora *Gears of War* en un port Android derivado de Xenia, seguimientos de RE7 y *God of War III*, *BOTW Recompiled*, YouTube en segundo plano y DOOM Mobile v0.4.9. También registra el análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
 
 El hallazgo geométrico principal es que “pantalla completa” depende de la ventana y superficie activas. En una lectura del clon de YouTube, la actividad ocupaba `2156×2344`, mientras que `SurfaceView` medía `2156×1212` (16:9). La app podía estar a pantalla completa y aun así conservar un video apaisado con bandas arriba y abajo. Para mostrar el video completo sin deformarlo, el modo debe conservar aspecto y aceptar espacio libre; para llenar el área con `zoom` se recorta el cuadro, y `stretch` lo deforma.
 
@@ -73,6 +73,8 @@ El recorte centrado en un juego también exige transformar las coordenadas táct
 | God of War III | Se revirtió un perfil de máximo rendimiento después de fallas reportadas en cinemáticas; más tarde el usuario reportó mejora con CPU all-core | No hay series de frametime, prueba controlada de causa ni evidencia de “100 %” de CPU/GPU o de Lossless generando cuadros |
 | BOTW Recompiled | Se aprobó el diseño conceptual de 60 FPS base y 120 FPS de salida interpolada | El trabajo se pausó para priorizar adaptación de pantalla; integración LSFG y 120 FPS de salida no están verificados |
 | YouTube en segundo plano | Se eligió un clon compatible basado en RVX 21.30.216 para probar controles de reproducción | El usuario informó que no aparecían controles en notificaciones; no quedó demostrada la reproducción ni la corrección de fondo |
+| DOOM Mobile 0.4.9 | Clon con ratio nativo derivado de la ventana interior; captura de gameplay a `2344×2156` y confirmación del usuario de pantalla completa | La captura mostró 60 FPS de forma instantánea; no es promedio estable. Amaral quedó seleccionado/importado, pero renderer Vulkan activo no fue confirmado por log |
+| The Last of Us Remastered para Android | Se analizó el texto de una publicación que afirma instalar un launcher y seleccionar un PKG | No se inspeccionaron ni verificaron APK, PKG, enlace, formato, requisitos o instalación |
 
 ### Caso 1 — *Resident Evil 7*: APK adaptativo y perfil de rendimiento
 
@@ -160,7 +162,7 @@ La ISO seleccionada fue *Pro Evolution Soccer 6 (Europe) (En,Fr,De,Es,It)*, de 1
 
 El APK actualizado se verificó con `apksigner`, mantuvo el mismo paquete/llave del clon, se instaló correctamente y abrió `NativeActivity`. El archivo `pes6.iso` persistió después de la actualización. Una captura tomada en la selección de idioma todavía mostraba bandas arriba y abajo. El usuario indicó luego “ya quedó”; ADB pasó a `offline` antes de leer los logs específicos del cargador o verificar el toque físico. Estado de evidencia: **actualización instalada y éxito reportado por el usuario; hook activo, pantalla 100 % y tacto final no verificados independientemente**. Para cerrar la reproducción se necesita una captura posterior en la misma escena y una prueba táctil en menú y gameplay.
 
-## Seguimientos y casos nuevos al 2026-11-02
+## Seguimientos y casos nuevos al 2026-11-07
 
 ### Caso 10 — *Gears of War* (2006): letterbox del presentador nativo
 
@@ -193,6 +195,26 @@ El usuario describió una meta de 60 FPS renderizados por el juego y 120 FPS de 
 ### Caso 13 — YouTube RVX: reproducción en segundo plano
 
 Después del clon adaptativo anterior, el usuario eligió una base compatible RVX 21.30.216 para probar reproducción de fondo y controles de notificación. El usuario informó que no aparecieron controles de reproducir/pausar. El registro no demuestra que MediaSession, reproducción con la app cerrada, canal de notificación o permisos estuvieran configurados ni que se aplicara una corrección. Al repetir, verifica por separado patch de background playback, servicio/media session, permiso de notificaciones en Android, canal y aparición de controles después de salir del player. No infieras que el parche de escala de pantalla añade playback en segundo plano.
+
+### Caso 14 — DOOM Mobile v0.4.9: ratio dinámico para el panel interior
+
+**Dispositivo y base:** HONOR Magic V2, Android 16, panel interior desplegado en horizontal. El port instalado era `org.doom.port` v0.4.9. El código de referencia fue el tag [`v0.4.9` de Desm0nt/doom-port](https://github.com/Desm0nt/doom-port/tree/v0.4.9), un port nativo ARM64 con un parser propio de aspecto. Los datos del usuario permanecieron en `Download/DOOM Mobile/{dm,romfs}`; no se incluyó contenido del juego en el repo.
+
+**Diagnóstico:** `dumpsys window` mostraba la actividad clonada en el rectángulo interior completo `2344×2156`; el letterbox inicial estaba en el tamaño/aspecto que elegía el renderer, no fuera de la ventana Android. En el tag consultado, `DM_DOOM_ASPECT=auto` calculaba un ancho pero imponía un mínimo de `960×720` (4:3). Ese mínimo dejaba bandas arriba y abajo en la pantalla interior, cuya relación es aproximadamente `1.087:1`.
+
+**Cambio del clon:** se creó `org.doom.port.magicv2adaptive` con etiqueta propia y se dejó instalado junto al paquete original. Se modificó únicamente el wrapper Java: al estar la preferencia en Auto y la ventana ser más estrecha que 4:3, el clon obtiene las dimensiones actuales de `WindowMetrics` y pasa la relación `ancho:alto` a la variable de aspecto que el motor v0.4.9 ya reconoce. El parser nativo calcula un cuadro base de unos `783×720` y alinea el ancho a bloques de 16 píxeles (`784×720`); el presenter lo escala a la superficie completa. Se reutilizó la biblioteca nativa de la build instalada para no mezclar una recompilación del motor con el cambio de wrapper. El APK original, sus preferencias y datos no se reemplazaron.
+
+**Arranque y resultado:** al iniciar en frío se vieron logotipos/videos y después el menú `Load from checkpoint`; el proceso permaneció vivo. Esto no fue un crash confirmado. Una activación del control A cargó el checkpoint y llegó a gameplay. La captura local del display interior era `2344×2156`, con escena y controles visibles hasta los bordes; el usuario confirmó que ya veía pantalla completa. La imagen de prueba se omitió del repositorio por contener el juego.
+
+**Driver y rendimiento:** el paquete Turnip Amaral 26.3.0-devel v4.6.1.4 se importó al clon y quedó seleccionado en la preferencia de driver. La telemetría del port mostró una lectura instantánea de 60 FPS en esa captura; no hay serie temporal ni frametime agregado para llamarlo 60 FPS estable. El logcat de este firmware no entregó mensajes útiles del port y no se obtuvo la lectura de renderer de `nativeDriverStatus`; por tanto, la selección/importación de Amaral está observada, pero no se afirma que fuera el renderer Vulkan activo ni que causara el arranque correcto. El intento previo con Gen8 V37 también se limitó a ser una selección; sus metadatos indicaban paquete Gen8/A8xx y no se demostró que el cierre percibido fuera un fallo de ese driver.
+
+**Límites:** se probó que un control A alcanzó el checkpoint, no toda el área táctil ni cada botón físico. La captura confirma pantalla completa en gameplay; no se conservó captura comparable del título tras el último cambio. La lectura de 60 FPS es puntual y el estado térmico, refresco del panel y renderer activo no se midieron en esa escena. No copies el override `DM_DOOM_ASPECT` a otros ports ni tomes el umbral Auto de esta versión como una norma de Android. Sigue la [guía reproducible del caso](../../../docs/doom-mobile-magic-v2.md) y el [código upstream v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9).
+
+### Caso 15 — *The Last of Us Remastered* para Android: análisis de publicación
+
+El usuario compartió una publicación de redes sociales que afirma que el port requiere Android 11+, 12 GB de RAM y 15 GB libres, y que se instala con un launcher APK y datos PKG seleccionados desde el menú. Se describió un enlace de descarga truncado y otro hospedado por un tercero. Esta sesión solo analizó el texto pegado; no se descargó ni inspeccionó ningún archivo, no se verificó la procedencia del launcher o del PKG y no se probó la instalación. Los requisitos y la guía son afirmaciones de esa publicación, no hechos técnicos establecidos.
+
+**Al repetir:** identificar paquete, firma, versión, ABI y documentación del launcher; determinar mediante contenido/firma el tipo real de archivo “PKG” y la ruta requerida; confirmar espacio temporal suficiente antes de copiar; y no asumir que un enlace abreviado o “sitio seguro” es confiable. No renombres el archivo para forzar importación y no borres los datos fuente antes de que el port valide la preparación y llegue a gameplay.
 
 ### Seguimiento de *Resident Evil 7*: hangs, driver y límites
 
@@ -274,3 +296,4 @@ Los resultados son de un solo dispositivo y aplicaciones/builds específicos. No
 5. Repo Halo proporcionado por el usuario, [Ayanokoji989/Halo-2](https://github.com/Ayanokoji989/Halo-2).
 6. Xenia Canary, [opciones de presentación](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing) y [patches oficiales de relación de aspecto para Gears of War](https://github.com/xenia-canary/game-patches/blob/main/patches/4D5307D5%20-%20Gears%20of%20War.patch.toml).
 7. zFitness, [gow3_android](https://github.com/zFitness/gow3_android), proyecto upstream indicado por el usuario para el port de *God of War III*.
+8. Desm0nt, [port Android de DOOM](https://github.com/Desm0nt/doom-port), [fuente v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9) y [guía de instalación de ese tag](https://github.com/Desm0nt/doom-port/blob/v0.4.9/docs/INSTALL.md).

@@ -1,6 +1,6 @@
 ---
 name: android-foldable-game-media-adaptation
-description: Use whenever an AI must install, launch, diagnose, modify, performance-tune, or make an Android game port or video app fit a foldable screen. Covers Android windows, native/recompiler letterboxing, viewports, touch mapping, crashes, app clones, APK patch/rebuild/sign/install, app-scoped graphics drivers, FPS limits, frame generation, YouTube playback and scaling on devices such as the Honor Magic V2. Read the case study before reusing historical settings.
+description: Use this skill whenever an AI is asked to install, launch, organize game data, diagnose crashes, remove black bars, adapt a game/video to a foldable, create an APK clone, change drivers, tune FPS, add frame generation, or debug touch on Android. It routes native ports, emulators, recompilers, Windows/Linux containers, and video players to the correct layer; preserves original apps/saves; and requires runtime evidence before calling a change successful. Read the case study before reusing any historical setting.
 ---
 
 # Adaptación de juegos y video en Android plegables
@@ -10,6 +10,28 @@ description: Use whenever an AI must install, launch, diagnose, modify, performa
 Resuelve problemas de inicio, pantalla, controles, gráficos y rendimiento en ports Android y aplicaciones de video sobre teléfonos plegables. Prioriza evidencia del dispositivo y cambios limitados a la app. No confundas un APK instalado con un juego funcional, una opción guardada con una función activa ni un video ampliado con una adaptación que conserva todo su contenido.
 
 Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`docs/ports-recompilados-letterbox.md`](../../docs/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código.
+
+## Inicio automático para agentes
+
+Activa esta skill por el tipo de trabajo, aunque el usuario no diga “skill”, “foldable” o “pantalla adaptativa”. Las expresiones frecuentes incluyen “abre el juego”, “se cierra”, “llega a gameplay”, “pantalla completa”, “franjas negras”, “clona el APK”, “no funciona el táctil”, “ponle un driver”, “llega a 60/120”, “Lossless”, “YouTube en segundo plano” y “ordena/instala los datos”.
+
+Primero clasifica el objetivo y abre solo las referencias pertinentes:
+
+| Señal del usuario | Ruta de trabajo | Evidencia mínima para cerrar |
+|---|---|---|
+| Franjas, recorte o imagen estirada | Medir display → ventana → superficie → viewport/cuadro; luego elegir `Fit`, `Cover`, `Stretch` o viewport/FOV | Misma escena capturada en el display correcto; anotar proporción, recorte/deformación e interacción táctil |
+| Cierre antes o al entrar al juego | Confirmar paquete, PID, actividad, transición de intro/menú y logs/tombstone antes de cambiar driver o datos | Arranque frío, escena de gameplay o causa de cierre identificada; no llamar crash a una secuencia de logos si el proceso sigue vivo |
+| Archivos de juego/ISO/PKG/OBB | Identificar port, formato real, ruta esperada, tamaño libre y estructura; inventariar antes de copiar | Recibo/log de importación y una ruta de arranque; conservar origen y saves |
+| Clon o APK parcheado | Confirmar paquete, versión, ABI, certificado y anclajes; cambiar package ID si va en paralelo | APK firmado/verificado, ambas apps instaladas según intención y el clon abierto |
+| Driver, resolución o rendimiento | Inspeccionar loader y fuente de ese port; cambiar una variable y conservar rollback | Configuración reportada por separado de renderer activo, FPS real, refresco y cuadros generados |
+| Video adaptativo o de fondo | Separar tamaño del reproductor de escalado, `MediaSession`, servicio, notificación y permisos | Probar cada tipo de player/modo y salida a segundo plano individualmente |
+| Limpieza de almacenamiento | Medir bytes realmente asignados y clasificar caché, build reproducible, datos, saves y contenido | Rutas/sizes antes y después; no borrar categorías abstractas como “Otros” |
+
+No reinicies una partida activa solo para obtener un dato que pueda recogerse sin interrumpirla. Si el usuario ya autorizó una instalación, clon o prueba durante la conversación, continúa sin pedir permiso por segunda vez; conserva el límite exacto de esa autorización.
+
+### Registro mínimo por sesión
+
+Usa [`templates/evidence-record.yaml`](../../templates/evidence-record.yaml) como esquema orientativo y guarda el registro fuera del repo cuando contenga seriales, rutas privadas, hashes de APK o datos del dispositivo. Conserva en Git únicamente resultados redactados y reproducibles. Usa [`templates/run-report.md`](../../templates/run-report.md) para entregar el resultado final.
 
 ## Límites de trabajo
 
@@ -81,6 +103,16 @@ Al cambiar el idioma, separa los textos del wrapper Android de los recursos del 
 - Distingue llenar la superficie con `Stretch` de un viewport/FOV calculado para el panel. Este último requiere cambios propios del juego y verificación de gameplay, HUD y cinemáticas. El caso Gears y sus límites están en la guía enlazada arriba.
 - Comprueba título/menú y gameplay por separado. Al cambiar el viewport o transformar `Surface`, vuelve a probar los controles táctiles en el centro y cerca de los bordes.
 
+#### Si el juego nativo ya acepta una relación de aspecto
+
+- Inspecciona el parser nativo y el punto en que se lee la configuración. Una preferencia llamada `Auto` puede tener una resolución mínima que no coincide con el ratio físico del panel.
+- Si Android ya entrega la ventana completa, deriva el ratio de `WindowMetrics` del área visible de la actividad al iniciar; normaliza orientación y excluye insets solo cuando el juego realmente no dibuje bajo ellos.
+- Reutiliza un argumento o variable documentada por esa misma versión, por ejemplo `DM_DOOM_ASPECT=<ancho>:<alto>` en DOOM Mobile v0.4.9. No copies ese nombre a otros ports.
+- Comprueba cuantización, límites y FOV del renderer. Si el motor redondea el ancho de salida, calcula el error de ratio y verifica la captura; no asumas que el entero enviado equivale a resolución de panel.
+- Prueba tanto la pantalla de inicio como gameplay. Para diagnóstico de cierre, observa el PID y las transiciones durante los videos de inicio: logos o una secuencia larga no son un crash si el mismo proceso sigue ejecutándose.
+- Mantén las preferencias del clon separadas del original. Si reutilizas una biblioteca nativa precompilada para modificar únicamente el wrapper, registra versión, ABI y hash local; úsala solo si corresponde exactamente a esa build.
+- El caso DOOM Mobile documentado en [`references/case-study.md`](references/case-study.md) llenó el panel en gameplay. La captura mostró 60 en el contador durante un instante; no demuestra 60 sostenidos ni confirma por sí sola qué driver Vulkan fue el activo.
+
 ### 6. Maneja almacenamiento del juego con inventario
 
 Cuando la tarea sea liberar espacio, mide carpetas y tamaños reales antes de borrar. Distingue caché regenerable de datos guardados, partidas, archivos descargados y copia completa del juego. `Borrar caché` no equivale a `Borrar datos`. Para una carpeta de juego que el usuario pidió eliminar, confirma ruta y contenido, conserva una copia si la instrucción no exige borrado definitivo y nunca borres la categoría genérica “Otros” a ciegas. Informa cuánto espacio se liberó realmente y qué archivos se conservaron.
@@ -146,6 +178,16 @@ La verificación debe cubrir la petición concreta:
 - FPS y frametime medidos en gameplay estable; no uses un menú o el valor configurado como prueba.
 - Retorno al perfil anterior posible.
 
+### Puertas de salida
+
+No marques la tarea como completa solo porque terminó el build, el APK aparece instalado o un valor se guardó. Cierra el flujo únicamente cuando el resultado observable coincida con la petición, o entrega de forma clara qué bloqueo externo impide terminarlo. Para pantalla, abre una escena de gameplay en la pantalla/postura solicitada. Para “abrir el juego”, mantén el proceso vivo y llega a una escena jugable; la pantalla de título, el video de inicio o un launcher no bastan. Para un crash, identifica la señal (PID muerto, tombstone, excepción o error reproducible) antes de afirmar causa.
+
+Si el dispositivo o la app no exponen logcat normal, documenta esa limitación y busca el log del propio port, los archivos `boot.log`, dumps de crash, eventos de DropBox filtrados por paquete y el estado de actividad/proceso. “No hay log disponible” no significa “no hubo error”; tampoco autoriza inventar un crash. Captura la evidencia antes de relanzar cuando el estado siga reproducible.
+
+### Matriz de decisión por arquitectura
+
+Antes de proponer un parche, clasifica el port con [`references/decision-matrix.md`](references/decision-matrix.md). El mismo síntoma visual puede estar en Android WindowManager, SurfaceView, un presenter Xenia/ReX, un renderer Vulkan nativo, una capa FEX/Box64/DXVK o el player de video; una variable de entorno solo sirve si esa build tiene el parser que la consume.
+
 ## Lenguaje de evidencia
 
 Usa estos estados en el reporte:
@@ -170,9 +212,14 @@ No subas “reportado” a “medido”. Una captura de un menú no prueba gamep
 6. Trade-off de proporción, recorte, deformación, rendimiento y latencia.
 7. Límites, datos no preservados y procedimiento de rollback.
 
+Adjunta el registro resumido con campos de [`templates/evidence-record.yaml`](../../templates/evidence-record.yaml). Omite del informe público seriales ADB, hashes privados si no aportan reproducción, dumps completos, nombre de cuenta, rutas personales, saves y capturas de contenido con copyright.
+
 ## Referencias del proyecto
 
 - [`Informe reproducible de casos`](references/case-study.md)
+- [`Matriz automática de selección de flujo`](references/decision-matrix.md)
+- [`Plantilla de registro de evidencia`](../../templates/evidence-record.yaml)
+- [`Plantilla de informe final`](../../templates/run-report.md)
 - [`Letterbox en ports Xenia/ReX`](../../docs/ports-recompilados-letterbox.md)
 - [README del proyecto](../../README.md)
 - [Guía Android para apps fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
