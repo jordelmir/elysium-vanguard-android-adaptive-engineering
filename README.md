@@ -12,6 +12,8 @@ El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 De
 - Procedimientos para crear clones Android firmados por separado, importar datos propios y preservar la app original.
 - Guías para mapear entrada táctil después de un cambio de escala o recorte.
 - Separación entre FPS del juego, límite configurado, refresco del panel y cuadros generados.
+- Una guía de diagnóstico gráfico reproducible para modelos negros, geometría ausente, texturas erróneas, flicker y fallos de renderer; incluye evidencia A/B y límites para comprobar drivers.
+- Un auditor estático en Python estándar para revisar renderer/hooks, ABI ELF y SHA-256 dentro de APKs sin extraerlos. La salida no afirma que un driver se haya cargado.
 - Casos de estudio en formato técnico con resultados, límites y evidencia disponible.
 - Una receta específica de DOOM Mobile v0.4.9: ratio dinámico desde `WindowMetrics` para quitar el letterbox 4:3 en el panel interior, con límite de prueba del driver y de FPS.
 - Un parche Smali acotado para el caso concreto de RE7; no es un adaptador universal.
@@ -33,6 +35,8 @@ La adaptación de escala siempre tiene un costo cuando la imagen y el panel tien
 - [Plantilla de informe de sesión](templates/run-report.md)
 - [Guía de letterbox en ports Xenia/ReX](docs/ports-recompilados-letterbox.md)
 - [Caso técnico DOOM Mobile en Magic V2](docs/doom-mobile-magic-v2.md)
+- [Diagnóstico reproducible de errores gráficos](docs/diagnostico-de-errores-graficos.md)
+- [Auditor estático de renderer/hooks en APK](tools/audit_android_renderer_apk.py)
 - [Arquitectura y diagnóstico de RE7](docs/arquitectura-y-diagnostico.md)
 - [Reproducción desde un APK propio](docs/reproduccion.md)
 - [Experimentos y evidencia de RE7](docs/resultados-y-evidencia.md)

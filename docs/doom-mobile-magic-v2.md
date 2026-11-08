@@ -44,6 +44,16 @@ Durante una apertura en frío, esta ejecución mostró los videos/logos de inici
 - **Original:** paquete original separado; el APK del clon se guardó localmente en Descargas del usuario. No se publicaron artefactos.
 - **Reversión:** cerrar/desinstalar únicamente `org.doom.port.magicv2adaptive` elimina el clon. Mantén `org.doom.port` y los datos fuente del juego.
 
+## Seguimiento gráfico: modelos animados negros en v0.4.18-test1
+
+Este defecto es independiente del letterbox documentado arriba, que correspondía al tag v0.4.9. No reutilices el parche de aspecto como arreglo de materiales o geometría.
+
+El registro del upstream para [`v0.4.18-test1` en el commit `085d0cb0`](https://github.com/Desm0nt/doom-port/blob/085d0cb0b3796ddbfa33c64b6d00776387ad4eba/docs/doom/BUGS_AND_FIXES.md) describe modelos animados negros en una ruta de Adreno 740. El cambio de clipping no resolvió por sí solo los cuerpos negros; el registro propone investigar índices dinámicos del UBO de huesos. Un ensayo con `DM_GFX_BONES_SSBO=1` mostró cuerpos/enemigos normales en un dispositivo, pero produjo flicker de suelo, una puerta ausente y un arma oscura. El registro deja `DM_VK_ROBUST=0` como el siguiente experimento, no como una reparación confirmada.
+
+En este proyecto se preparó un clon separado para diagnóstico gráfico con una variante nativa de prueba y bibliotecas del loader. La confirmación más reciente del usuario es que los gráficos ya se ven corregidos. No se conservó en esta sesión una captura comparable final ni un log del mismo proceso que demuestre el driver activo o aísle qué cambio causó la mejora. Por tanto, el resultado queda como **confirmado por el usuario; causalidad técnica y renderer activo sin verificación independiente**. No presentes `robustBufferAccess=VK_FALSE`, SSBO, un driver específico ni la presencia de hooks como causa probada.
+
+Al continuar el caso, conserva el APK original y prueba un solo cambio por clon; captura el mismo encuadre con el mismo checkpoint y compara una segunda escena que contenga suelo, puertas, armas, sombras y modelos animados. Consulta el [flujo completo de diagnóstico gráfico](diagnostico-de-errores-graficos.md) y usa el [auditor estático del APK](../tools/audit_android_renderer_apk.py) solo para inspección de paquete. La auditoría no demuestra carga en runtime.
+
 ## Reproducción para otra IA
 
 1. Reidentifica el teléfono, serial ADB, display interior, postura, bounds y versión del port.

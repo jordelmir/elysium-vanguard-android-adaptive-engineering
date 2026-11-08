@@ -1,6 +1,6 @@
 ---
 name: android-foldable-game-media-adaptation
-description: Use this skill whenever an AI is asked to install, launch, organize game data, diagnose crashes, remove black bars, adapt a game/video to a foldable, create an APK clone, change drivers, tune FPS, add frame generation, or debug touch on Android. It routes native ports, emulators, recompilers, Windows/Linux containers, and video players to the correct layer; preserves original apps/saves; and requires runtime evidence before calling a change successful. Read the case study before reusing any historical setting.
+description: Use this skill whenever an AI is asked to install, launch, organize game data, diagnose crashes or graphics defects, remove black bars, adapt a game/video to a foldable, create an APK clone, change drivers, tune FPS, add frame generation, or debug touch on Android. It routes native ports, emulators, recompilers, Windows/Linux containers, and video players to the correct layer; preserves original apps/saves; and requires runtime evidence before calling a change successful. Read the case study before reusing any historical setting.
 ---
 
 # Adaptación de juegos y video en Android plegables
@@ -24,6 +24,7 @@ Primero clasifica el objetivo y abre solo las referencias pertinentes:
 | Archivos de juego/ISO/PKG/OBB | Identificar port, formato real, ruta esperada, tamaño libre y estructura; inventariar antes de copiar | Recibo/log de importación y una ruta de arranque; conservar origen y saves |
 | Clon o APK parcheado | Confirmar paquete, versión, ABI, certificado y anclajes; cambiar package ID si va en paralelo | APK firmado/verificado, ambas apps instaladas según intención y el clon abierto |
 | Driver, resolución o rendimiento | Inspeccionar loader y fuente de ese port; cambiar una variable y conservar rollback | Configuración reportada por separado de renderer activo, FPS real, refresco y cuadros generados |
+| Geometría/modelos negros, texturas incorrectas, flicker o corrupción | Clasificar escena y capa; comprobar build exacta, renderer, loader y logs; A/B reversible de una variable | Misma escena antes/después y segunda escena sin regresión; driver activo por separado |
 | Video adaptativo o de fondo | Separar tamaño del reproductor de escalado, `MediaSession`, servicio, notificación y permisos | Probar cada tipo de player/modo y salida a segundo plano individualmente |
 | Limpieza de almacenamiento | Medir bytes realmente asignados y clasificar caché, build reproducible, datos, saves y contenido | Rutas/sizes antes y después; no borrar categorías abstractas como “Otros” |
 
@@ -70,6 +71,18 @@ Compara, en orden:
 Usa `dumpsys window`, `dumpsys activity`, `dumpsys SurfaceFlinger`, jerarquía UI y capturas del display activo. Un panel de 2156×2344 con una superficie de 2156×1212 no prueba un error de resolución: la superficie mide 16:9 y conserva su relación dentro de una pantalla casi cuadrada. Atribuye la franja a la capa que los bounds demuestran.
 
 Separa también un error de layout de un defecto de render: bandas, recorte o controles desplazados apuntan a ventana/viewport/mapeo; geometría ausente, parpadeo, sombras rotas o crash requieren comparar renderer, driver y logs.
+
+#### Errores de render gráficos
+
+Para modelos negros, geometría ausente, texturas corruptas, shaders defectuosos o flicker, sigue la guía [Diagnóstico reproducible de errores gráficos](../../docs/diagnostico-de-errores-graficos.md). Como mínimo:
+
+1. Clasifica el síntoma y fija una escena, cámara, build, display y configuración repetibles.
+2. Separa objeto/material/shader del viewport, superficie, datos del juego y ruta del loader.
+3. Comprueba qué bibliotecas y ABI están dentro del APK; no concluyas que el driver está activo porque aparezca en la UI.
+4. Cambia una sola variable en un clon, guarda rollback y compara la misma escena más una escena distinta.
+5. Etiqueta la conclusión como reporte del usuario, captura comparable, log del proceso o verificación runtime. Si el usuario dice que se corrigió pero no hay evidencia conservada, registra el resultado como reportado y no inventes la causa.
+
+El script [`tools/audit_android_renderer_apk.py`](../../tools/audit_android_renderer_apk.py) es un preflight estático para el renderer y hooks esperados del caso DOOM/AdrenoTools. Solo comprueba presencia, ABI/ELF y hashes; no instala ni prueba bibliotecas en runtime.
 
 ### 4. Elige el encuadre según el contenido
 

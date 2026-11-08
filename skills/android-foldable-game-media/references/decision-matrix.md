@@ -10,6 +10,7 @@ Esta referencia permite que un agente elija la capa de inspección antes de modi
 4. **¿La imagen llena el panel y los toques caen en otro sitio?** Mide el mapeo táctil antes de tocar más escala; aplica la inversa geométrica del mismo recorte/estiramiento y prueba menú y gameplay.
 5. **¿La app aparenta cerrarse al arrancar?** Lee PID/actividad a lo largo de la transición, observa si son videos/logos o un menú, y adquiere el crash/log antes de cambiar driver. Solo modifica datos después de validar formato y ruta.
 6. **¿El objetivo es FPS o interpolación?** Registra por separado tope configurado, FPS del motor, frecuencia del panel, FPS generados, frametime, input/latencia y escena.
+7. **¿Se ve un defecto dentro del cuadro?** Separa escena completa negra, modelos/materiales negros, geometría ausente, texturas corruptas y flicker. Compara renderer, driver cargado, shaders/datos y logs en la misma escena; no trates el viewport como causa por defecto.
 
 ## Matriz por arquitectura
 
@@ -80,6 +81,18 @@ Después de crear un clon, no supongas que comparte saves, preferencias o estado
 | FPS generados | Contador real de salida de frame generation sincronizado con FPS base | Salida interpolada observada; no cambia por sí sola el tick ni el input base |
 
 Un driver nombrado “Gen8”, “patched” o “Adreno” no determina compatibilidad por sí solo. Compara metadata, ABI, API, GPU, loader y runtime. El V38 debe evaluarse con la evidencia de su loader concreto; un ZIP compartido no se vuelve un driver global. No persigas 100 % de CPU/GPU: mide el cuello de botella, carga por núcleo, esperas y frametime.
+
+## Defectos de imagen y render
+
+| Síntoma reproducido | Primeras capas a inspeccionar | Evita concluir |
+|---|---|---|
+| Solo algunos modelos aparecen negros | skinning/índices, shader, buffers/descriptores, material y ruta del renderer | Que sea una textura faltante o un driver incompatible sin inspección |
+| Geometría falta o deja agujeros | culling/clipping, buffers de índices, sincronización y cámara | Que una mejora de encuadre haya arreglado el render |
+| Textura errónea, negra o rosa | recurso y formato/mip, descriptor/sampler, shader, loader de datos | Que un cambio de viewport pueda reparar recursos |
+| Flicker o corrupción temporal | carreras CPU/GPU, barreras, memoria, driver y shader | Que una única captura estable demuestre resolución |
+| Cuadro entero negro/crash | PID, transición de escena, swapchain, renderer, inicialización y logs/tombstone | Que “driver seleccionado” signifique inicializado o activo |
+
+Procedimiento, preflight estático del APK y límites del caso DOOM están en la [guía de diagnóstico gráfico](../../../docs/diagnostico-de-errores-graficos.md). La presencia de una biblioteca en el APK solo verifica el paquete; para una afirmación de carga, usa estado/log del mismo proceso. Compara una sola variable en un clon y conserva el driver/configuración que funcionaba. Una variante que arregla un modelo pero rompe suelo, puerta, arma u otra escena es una regresión, no una solución general.
 
 ## Formatos de datos e instalación
 

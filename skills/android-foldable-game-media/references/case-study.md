@@ -216,6 +216,16 @@ El usuario compartió una publicación de redes sociales que afirma que el port 
 
 **Al repetir:** identificar paquete, firma, versión, ABI y documentación del launcher; determinar mediante contenido/firma el tipo real de archivo “PKG” y la ruta requerida; confirmar espacio temporal suficiente antes de copiar; y no asumir que un enlace abreviado o “sitio seguro” es confiable. No renombres el archivo para forzar importación y no borres los datos fuente antes de que el port valide la preparación y llegue a gameplay.
 
+### Caso 16 — DOOM Mobile v0.4.18-test1: modelos animados negros
+
+**Síntoma y base:** el upstream registra modelos/cuerpos animados negros con una ruta Adreno 740. Es una falla dentro del cuadro, no una variante del letterbox del caso v0.4.9. El análisis está fijado a [BUGS_AND_FIXES.md en el commit `085d0cb0`](https://github.com/Desm0nt/doom-port/blob/085d0cb0b3796ddbfa33c64b6d00776387ad4eba/docs/doom/BUGS_AND_FIXES.md), donde clipping/culling, skinning y lecturas de buffers se separan como hipótesis.
+
+**Experimentos upstream y regresiones:** el workaround de clipping no resolvió el render negro. El modo `DM_GFX_BONES_SSBO=1` hizo aparecer cuerpos y enemigos en una prueba, pero el mismo registro encontró flicker de suelo, una puerta ausente y un arma oscura. `DM_VK_ROBUST=0` quedó anotado como el siguiente test; eso no prueba por sí solo la causa ni el resultado en el Magic V2. No conviertas ninguna de esas variables en predeterminado universal.
+
+**Estado del caso local:** se generó un APK de clon de diagnóstico con una variante nativa experimental y archivos del loader; el usuario confirmó después que el aspecto gráfico ya quedó arreglado. No se conservó una captura final comparable, una sesión A/B ni un log del renderer del mismo proceso. No se puede asignar la mejora a un flag, al driver personalizado o a los hooks ni confirmar cuál renderer estuvo activo. Estado: **resultado reportado por el usuario; causa y driver activo sin verificación independiente**.
+
+**Cómo repetir:** conserva original y saves; identifica APK, ABI, GPU, versión del port y escena exactos; usa [`docs/diagnostico-de-errores-graficos.md`](../../../docs/diagnostico-de-errores-graficos.md); inspecciona estáticamente hooks y ABI antes de instalar; valida el driver por log del mismo proceso; cambia una sola variable en el clon; compara la misma escena y otra escena con suelo, puertas, armas y animaciones. El script local es preflight de paquete, no verificador de runtime. No publiques APK, driver, assets ni capturas protegidas.
+
 ### Seguimiento de *Resident Evil 7*: hangs, driver y límites
 
 El perfil histórico RE7 de este informe registraba V38 y un límite configurado de 70. Después se reportaron nuevos estados colgados; el usuario pidió probar el driver Adreno 27 R1, limitar a 120 FPS y mantener una configuración de pantalla de 120 Hz mediante un script de inicio de Termux. También solicitó acceso a todos los núcleos de CPU. El registro del proyecto no contiene el script final, una lectura posterior de `dumpsys display`, el log del renderer asociado al proceso ni una sesión comparativa que demuestre 120 FPS sostenidos o estabilidad. Por ello, conserva el caso V38/70 como histórico y trata 27 R1/120/core policy como experimento posterior que debe volver a identificarse y verificarse antes de reutilizarlo.

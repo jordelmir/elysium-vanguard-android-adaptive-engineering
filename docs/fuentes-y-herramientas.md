@@ -25,6 +25,8 @@ REA complementa ADB; no reemplaza ni administra el transporte del dispositivo. S
 - [Halo 2 Android port indicado por el usuario](https://github.com/Ayanokoji989/Halo-2)
 - [zFitness: port gow3_android](https://github.com/zFitness/gow3_android)
 - [Desm0nt: DOOM port Android](https://github.com/Desm0nt/doom-port), [tag v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9) y [guía de instalación v0.4.9](https://github.com/Desm0nt/doom-port/blob/v0.4.9/docs/INSTALL.md)
+- [Registro upstream de fallas gráficas de DOOM, commit v0.4.18-test1](https://github.com/Desm0nt/doom-port/blob/085d0cb0b3796ddbfa33c64b6d00776387ad4eba/docs/doom/BUGS_AND_FIXES.md) y [código de esa revisión](https://github.com/Desm0nt/doom-port/tree/085d0cb0b3796ddbfa33c64b6d00776387ad4eba)
+- [Vulkan Guide: robustez de memoria](https://docs.vulkan.org/guide/latest/robustness.html)
 - [Xenia Canary: opciones de presentación](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing)
 - [Xenia Canary: patches de Gears of War](https://github.com/xenia-canary/game-patches/blob/main/patches/4D5307D5%20-%20Gears%20of%20War.patch.toml)
 - [Android: MediaProjection](https://developer.android.com/media/grow/media-projection)

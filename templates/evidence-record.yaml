@@ -1,5 +1,5 @@
 # Plantilla local. Sustituye solo los campos necesarios. Guarda valores sensibles fuera de Git.
-schema_version: 1
+schema_version: 2
 session:
   date_utc: "YYYY-MM-DD"
   objective: ""
@@ -25,6 +25,9 @@ baseline:
   surface_bounds_px: ""
   game_or_video_frame_bounds_px: ""
   observed_problem_layer: "android_window | surface | presenter | viewport | game_content | video_player | input | unknown"
+  graphics_symptom: "black_scene | black_models | missing_geometry | bad_texture_or_material | shader_error | flicker_or_corruption | other | unknown"
+  affected_objects_or_passes: []
+  reproduction_scene_and_camera: ""
   screenshot_local_path: ""
   screenshot_same_display: "yes | no | unknown"
 change:
@@ -40,6 +43,7 @@ driver:
   selected: "yes | no | unknown | n/a"
   loaded_same_process: "yes | no | unknown | n/a"
   renderer_device_confirmed: "yes | no | unknown | n/a"
+  driver_log_same_process_path: ""
 fps:
   configured_cap: ""
   game_fps_instantaneous: ""
@@ -56,6 +60,10 @@ verification:
   crop_or_stretch: ""
   touch_center: "pass | fail | not_tested"
   touch_edges: "pass | fail | not_tested"
+  same_graphics_scene_before_after: "yes | no | unknown"
+  second_scene_regression_check: "pass | fail | not_tested"
+  graphics_result_user_reported: "yes | no"
+  final_graphics_screenshot_local_path: ""
   crash_log_reviewed: "yes | no | unavailable"
   user_confirmation: "yes | no"
 conclusion:

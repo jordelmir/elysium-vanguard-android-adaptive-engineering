@@ -6,6 +6,7 @@ Este repositorio es una guía operativa de ingeniería para juegos, ports y apps
 2. Lee [`skills/android-foldable-game-media/references/decision-matrix.md`](skills/android-foldable-game-media/references/decision-matrix.md) para seleccionar la capa y arquitectura.
 3. Consulta el caso relevante en [`skills/android-foldable-game-media/references/case-study.md`](skills/android-foldable-game-media/references/case-study.md). Los valores de un juego/build no se trasladan a otro sin revisar fuente y runtime.
 4. Si el caso coincide con un documento especializado, úsalo junto a la skill: por ejemplo [`docs/doom-mobile-magic-v2.md`](docs/doom-mobile-magic-v2.md) o [`docs/ports-recompilados-letterbox.md`](docs/ports-recompilados-letterbox.md).
+   Para geometría ausente, modelos negros, texturas incorrectas, shaders o flicker, lee también [`docs/diagnostico-de-errores-graficos.md`](docs/diagnostico-de-errores-graficos.md) y usa su auditor estático de APK solo como preflight, no como prueba de driver activo.
 5. Separa configuración, instalación, proceso iniciado, escena reproducida, función confirmada en runtime, lectura puntual y resultado sostenido. No infieras un crash, driver activo, FPS estable o pantalla completa a partir de un único indicador.
 6. Conserva originales, saves, datos y trabajo ajeno. No pongas APKs, bibliotecas de juego, datos, drivers, claves, logs privados ni capturas con contenido protegido en Git.
 7. Usa las plantillas en [`templates/`](templates/) para reportar resultados y límites.
