@@ -11,3 +11,5 @@ Al encuadrar una imagen en una pantalla con otra proporción hay tres opciones: 
 La publicación describe casos de un dispositivo y versiones concretas de ports y aplicaciones. No garantiza compatibilidad con otras versiones de APK, GPU, pantallas plegables, drivers, firmantes ni capas de compatibilidad. Los valores de entorno y cvars del caso Xenia/ReX dependen de su wrapper; los valores binarios no se deben trasladar sin el hash exacto de la biblioteca. Los resultados reportados por el usuario no se convierten en mediciones hasta contar con capturas/logs de runtime comparables.
 
 El auditor de APK no ejecuta el contenido y su resultado no prueba selección, carga ni uso de un driver; esa evidencia debe proceder del mismo proceso del juego.
+
+La skill importable mantiene copias portables de la guía gráfica, el auditor, plantillas y guías relevantes dentro de `skills/android-foldable-game-media/`. Al modificar sus fuentes canónicas en `docs/`, `tools/` o `templates/`, actualiza también esas copias antes de publicar una versión nueva del paquete.

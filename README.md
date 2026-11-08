@@ -20,6 +20,8 @@ El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 De
 
 Los agentes que trabajen en este checkout deben comenzar por [AGENTS.md](AGENTS.md), que enruta automáticamente a la skill y a la matriz apropiadas.
 
+La carpeta [`skills/android-foldable-game-media/`](skills/android-foldable-game-media/) también es un paquete importable de skill: incluye su `SKILL.md`, referencias, guía de errores gráficos, plantillas y auditor APK dentro de la misma carpeta. Sus referencias externas usan enlaces públicos al repo.
+
 ## Alcance y derechos
 
 Este repositorio publica documentación y herramientas originales. **No contiene APKs, ISOs, ejecutables de juegos, saves, drivers, `Lossless.dll`, claves de firma ni capturas con contenido protegido.** Cada persona debe usar copias que tenga derecho a modificar y respetar las licencias del juego, el port y las herramientas.

@@ -30,7 +30,7 @@ El hallazgo geométrico principal es que “pantalla completa” depende de la v
 - El panel interior del Magic V2 aparece en las capturas en ambos sentidos: `2156×2344` en orientación vertical y `2344×2156` en horizontal.
 - El usuario seleccionó únicamente la pantalla interior desplegada para el caso Halo 2.
 - El entorno de pruebas usó ADB; la identidad del serial se omite porque es temporal y no hace falta para reproducir el método.
-- Para RE7, el repositorio conserva los datos del contenedor, perfil, patch Smali y límites de evidencia. Véanse [`README.md`](../../../README.md), [`arquitectura-y-diagnostico.md`](../../../docs/arquitectura-y-diagnostico.md), [`reproduccion.md`](../../../docs/reproduccion.md) y [`resultados-y-evidencia.md`](../../../docs/resultados-y-evidencia.md).
+- Para RE7, el repositorio conserva los datos del contenedor, perfil, patch Smali y límites de evidencia. Véanse [`README.md`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/README.md), [`arquitectura-y-diagnostico.md`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/arquitectura-y-diagnostico.md), [`reproduccion.md`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/reproduccion.md) y [`resultados-y-evidencia.md`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/resultados-y-evidencia.md).
 
 ### Método general
 
@@ -80,7 +80,7 @@ El recorte centrado en un juego también exige transformar las coordenadas táct
 
 **Arquitectura:** port Windows en un contenedor Android con FEXCore/Box64, DXVK/VKD3D y Vulkan; el trabajo fue en la capa Android representada por Smali, no una recompilación del motor del juego.
 
-**Cambio documentado:** la transformación de `contain` a `cover` en `ViewTransformation.update(IIII)V`, además de alinear la transformación táctil de pantalla completa en `TouchpadView.updateXform(IIII)V`. El script [`tools/patch_viewport.py`](../../../tools/patch_viewport.py) valida anclajes versionados y falla si el Smali no coincide. La compilación de prueba usó otro ID de paquete y dejó instalado el original.
+**Cambio documentado:** la transformación de `contain` a `cover` en `ViewTransformation.update(IIII)V`, además de alinear la transformación táctil de pantalla completa en `TouchpadView.updateXform(IIII)V`. El script [`tools/patch_viewport.py`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/tools/patch_viewport.py) valida anclajes versionados y falla si el Smali no coincide. La compilación de prueba usó otro ID de paquete y dejó instalado el original.
 
 **Perfil conservado por el repo:** contenedor `1024×576`, Turnip Gen8 V38 parcheado, DXVK 2.3.1 con límite configurado de 70, Box64 `PERFORMANCE`, FEXCore `INTERMEDIATE`; algunos efectos gráficos fueron reducidos. El repo describe V38 como perfil probado/configurado, pero deja claro que el uso real de V38 por cada proceso requiere logs runtime. El límite 70 no es FPS sostenido.
 
@@ -88,7 +88,7 @@ El objetivo de FPS cambió a lo largo de la conversación: primero se pidió 120
 
 El usuario expresó que no quería tratar la temperatura como restricción para esa iteración. La regla reutilizable es respetar esa prioridad y reportar la lectura térmica, sin confundirla con FPS o estabilidad demostrados.
 
-**Evidencia y límites:** las capturas locales del repo muestran el menú de RE7 y lecturas distintas según la escena. El usuario comunicó luego pantalla completa y más de 75 FPS; no quedó una captura final independiente que pruebe FPS reales sostenidos. El perfil está documentado en [`resultados-y-evidencia.md`](../../../docs/resultados-y-evidencia.md); no se debe copiar a un port distinto sin el mismo loader y evidencia.
+**Evidencia y límites:** las capturas locales del repo muestran el menú de RE7 y lecturas distintas según la escena. El usuario comunicó luego pantalla completa y más de 75 FPS; no quedó una captura final independiente que pruebe FPS reales sostenidos. El perfil está documentado en [`resultados-y-evidencia.md`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/resultados-y-evidencia.md); no se debe copiar a un port distinto sin el mismo loader y evidencia.
 
 ### Caso 2 — *Halo 2*: cierre al iniciar gameplay, driver y pantalla interior
 
@@ -174,7 +174,7 @@ El APK actualizado se verificó con `apksigner`, mantuvo el mismo paquete/llave 
 
 **Resultado:** el APK del clon se actualizó en sitio con la misma identidad de paquete y firma. Se capturó el título y después una escena real de gameplay; ambos llenaron la captura sin letterbox. El usuario confirmó que ya veía pantalla completa. Los saves se conservaron y se habían respaldado antes de actualizar.
 
-**Interpretación y límites:** el método efectivo fue `Stretch`. No se vieron bandas ni se recortaron los extremos del cuadro en esas capturas, pero la imagen 16:9 se deformó al ratio aproximado 1.087:1 del panel. No se amplió la cámara ni se generó contenido nuevo fuera del cuadro. Una captura mostró 27 FPS en un instante; no mide rendimiento estable. El tacto de todos los bordes tampoco quedó medido. La [guía específica](../../../docs/ports-recompilados-letterbox.md) separa este ajuste de un patch real de viewport/FOV.
+**Interpretación y límites:** el método efectivo fue `Stretch`. No se vieron bandas ni se recortaron los extremos del cuadro en esas capturas, pero la imagen 16:9 se deformó al ratio aproximado 1.087:1 del panel. No se amplió la cámara ni se generó contenido nuevo fuera del cuadro. Una captura mostró 27 FPS en un instante; no mide rendimiento estable. El tacto de todos los bordes tampoco quedó medido. La [guía específica](ports-recompilados-letterbox.md) separa este ajuste de un patch real de viewport/FOV.
 
 La documentación oficial de Xenia Canary confirma que `present_letterbox=false` estira el cuadro. Sus patches públicos para *Gears of War* ofrecen perfiles 16:10 y 21:9 con cambios de viewport/FOV; esos ratios no coinciden con el panel casi cuadrado de esta prueba. No deben aplicarse sin un patch calculado para la proporción medida y una verificación de menú, gameplay, HUD y cinemáticas.
 
@@ -208,7 +208,7 @@ Después del clon adaptativo anterior, el usuario eligió una base compatible RV
 
 **Driver y rendimiento:** el paquete Turnip Amaral 26.3.0-devel v4.6.1.4 se importó al clon y quedó seleccionado en la preferencia de driver. La telemetría del port mostró una lectura instantánea de 60 FPS en esa captura; no hay serie temporal ni frametime agregado para llamarlo 60 FPS estable. El logcat de este firmware no entregó mensajes útiles del port y no se obtuvo la lectura de renderer de `nativeDriverStatus`; por tanto, la selección/importación de Amaral está observada, pero no se afirma que fuera el renderer Vulkan activo ni que causara el arranque correcto. El intento previo con Gen8 V37 también se limitó a ser una selección; sus metadatos indicaban paquete Gen8/A8xx y no se demostró que el cierre percibido fuera un fallo de ese driver.
 
-**Límites:** se probó que un control A alcanzó el checkpoint, no toda el área táctil ni cada botón físico. La captura confirma pantalla completa en gameplay; no se conservó captura comparable del título tras el último cambio. La lectura de 60 FPS es puntual y el estado térmico, refresco del panel y renderer activo no se midieron en esa escena. No copies el override `DM_DOOM_ASPECT` a otros ports ni tomes el umbral Auto de esta versión como una norma de Android. Sigue la [guía reproducible del caso](../../../docs/doom-mobile-magic-v2.md) y el [código upstream v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9).
+**Límites:** se probó que un control A alcanzó el checkpoint, no toda el área táctil ni cada botón físico. La captura confirma pantalla completa en gameplay; no se conservó captura comparable del título tras el último cambio. La lectura de 60 FPS es puntual y el estado térmico, refresco del panel y renderer activo no se midieron en esa escena. No copies el override `DM_DOOM_ASPECT` a otros ports ni tomes el umbral Auto de esta versión como una norma de Android. Sigue la [guía reproducible del caso](doom-mobile-magic-v2.md) y el [código upstream v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9).
 
 ### Caso 15 — *The Last of Us Remastered* para Android: análisis de publicación
 
@@ -224,7 +224,7 @@ El usuario compartió una publicación de redes sociales que afirma que el port 
 
 **Estado del caso local:** se generó un APK de clon de diagnóstico con una variante nativa experimental y archivos del loader; el usuario confirmó después que el aspecto gráfico ya quedó arreglado. No se conservó una captura final comparable, una sesión A/B ni un log del renderer del mismo proceso. No se puede asignar la mejora a un flag, al driver personalizado o a los hooks ni confirmar cuál renderer estuvo activo. Estado: **resultado reportado por el usuario; causa y driver activo sin verificación independiente**.
 
-**Cómo repetir:** conserva original y saves; identifica APK, ABI, GPU, versión del port y escena exactos; usa [`docs/diagnostico-de-errores-graficos.md`](../../../docs/diagnostico-de-errores-graficos.md); inspecciona estáticamente hooks y ABI antes de instalar; valida el driver por log del mismo proceso; cambia una sola variable en el clon; compara la misma escena y otra escena con suelo, puertas, armas y animaciones. El script local es preflight de paquete, no verificador de runtime. No publiques APK, driver, assets ni capturas protegidas.
+**Cómo repetir:** conserva original y saves; identifica APK, ABI, GPU, versión del port y escena exactos; usa [`diagnostico-de-errores-graficos.md`](diagnostico-de-errores-graficos.md); inspecciona estáticamente hooks y ABI antes de instalar; valida el driver por log del mismo proceso; cambia una sola variable en el clon; compara la misma escena y otra escena con suelo, puertas, armas y animaciones. El script local es preflight de paquete, no verificador de runtime. No publiques APK, driver, assets ni capturas protegidas.
 
 ### Seguimiento de *Resident Evil 7*: hangs, driver y límites
 
@@ -299,7 +299,7 @@ Los resultados son de un solo dispositivo y aplicaciones/builds específicos. No
 
 ## Referencias
 
-1. Repo y perfil RE7: [`README`](../../../README.md), [`diagnóstico`](../../../docs/arquitectura-y-diagnostico.md), [`método APK`](../../../docs/reproduccion.md), [`evidencia`](../../../docs/resultados-y-evidencia.md), [`LSFG`](../../../docs/generacion-de-cuadros.md).
+1. Repo y perfil RE7: [`README`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/README.md), [`diagnóstico`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/arquitectura-y-diagnostico.md), [`método APK`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/reproduccion.md), [`evidencia`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/resultados-y-evidencia.md), [`LSFG`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/generacion-de-cuadros.md).
 2. Android Developers, [Make your app fold aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware) y [Use window size classes](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes).
 3. Morphe Desktop, [CLI documentation](https://github.com/MorpheApp/morphe-desktop/blob/main/docs/documentation.md).
 4. Anddea, [patch list and compatible YouTube versions](https://github.com/anddea/revanced-patches), incluido `Fullscreen video scale`.

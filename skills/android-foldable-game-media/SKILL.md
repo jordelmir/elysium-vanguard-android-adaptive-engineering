@@ -9,7 +9,7 @@ description: Use this skill whenever an AI is asked to install, launch, organize
 
 Resuelve problemas de inicio, pantalla, controles, gráficos y rendimiento en ports Android y aplicaciones de video sobre teléfonos plegables. Prioriza evidencia del dispositivo y cambios limitados a la app. No confundas un APK instalado con un juego funcional, una opción guardada con una función activa ni un video ampliado con una adaptación que conserva todo su contenido.
 
-Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`docs/ports-recompilados-letterbox.md`](../../docs/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código.
+Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`references/ports-recompilados-letterbox.md`](references/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código.
 
 ## Inicio automático para agentes
 
@@ -32,7 +32,7 @@ No reinicies una partida activa solo para obtener un dato que pueda recogerse si
 
 ### Registro mínimo por sesión
 
-Usa [`templates/evidence-record.yaml`](../../templates/evidence-record.yaml) como esquema orientativo y guarda el registro fuera del repo cuando contenga seriales, rutas privadas, hashes de APK o datos del dispositivo. Conserva en Git únicamente resultados redactados y reproducibles. Usa [`templates/run-report.md`](../../templates/run-report.md) para entregar el resultado final.
+Usa [`references/templates/evidence-record.yaml`](references/templates/evidence-record.yaml) como esquema orientativo y guarda el registro fuera del repo cuando contenga seriales, rutas privadas, hashes de APK o datos del dispositivo. Conserva en Git únicamente resultados redactados y reproducibles. Usa [`references/templates/run-report.md`](references/templates/run-report.md) para entregar el resultado final.
 
 ## Límites de trabajo
 
@@ -74,7 +74,7 @@ Separa también un error de layout de un defecto de render: bandas, recorte o co
 
 #### Errores de render gráficos
 
-Para modelos negros, geometría ausente, texturas corruptas, shaders defectuosos o flicker, sigue la guía [Diagnóstico reproducible de errores gráficos](../../docs/diagnostico-de-errores-graficos.md). Como mínimo:
+Para modelos negros, geometría ausente, texturas corruptas, shaders defectuosos o flicker, sigue la guía [Diagnóstico reproducible de errores gráficos](references/diagnostico-de-errores-graficos.md). Como mínimo:
 
 1. Clasifica el síntoma y fija una escena, cámara, build, display y configuración repetibles.
 2. Separa objeto/material/shader del viewport, superficie, datos del juego y ruta del loader.
@@ -82,7 +82,7 @@ Para modelos negros, geometría ausente, texturas corruptas, shaders defectuosos
 4. Cambia una sola variable en un clon, guarda rollback y compara la misma escena más una escena distinta.
 5. Etiqueta la conclusión como reporte del usuario, captura comparable, log del proceso o verificación runtime. Si el usuario dice que se corrigió pero no hay evidencia conservada, registra el resultado como reportado y no inventes la causa.
 
-El script [`tools/audit_android_renderer_apk.py`](../../tools/audit_android_renderer_apk.py) es un preflight estático para el renderer y hooks esperados del caso DOOM/AdrenoTools. Solo comprueba presencia, ABI/ELF y hashes; no instala ni prueba bibliotecas en runtime.
+El script [`scripts/audit_android_renderer_apk.py`](scripts/audit_android_renderer_apk.py) es un preflight estático para el renderer y hooks esperados del caso DOOM/AdrenoTools. Solo comprueba presencia, ABI/ELF y hashes; no instala ni prueba bibliotecas en runtime.
 
 ### 4. Elige el encuadre según el contenido
 
@@ -225,16 +225,16 @@ No subas “reportado” a “medido”. Una captura de un menú no prueba gamep
 6. Trade-off de proporción, recorte, deformación, rendimiento y latencia.
 7. Límites, datos no preservados y procedimiento de rollback.
 
-Adjunta el registro resumido con campos de [`templates/evidence-record.yaml`](../../templates/evidence-record.yaml). Omite del informe público seriales ADB, hashes privados si no aportan reproducción, dumps completos, nombre de cuenta, rutas personales, saves y capturas de contenido con copyright.
+Adjunta el registro resumido con campos de [`references/templates/evidence-record.yaml`](references/templates/evidence-record.yaml). Omite del informe público seriales ADB, hashes privados si no aportan reproducción, dumps completos, nombre de cuenta, rutas personales, saves y capturas de contenido con copyright.
 
 ## Referencias del proyecto
 
 - [`Informe reproducible de casos`](references/case-study.md)
 - [`Matriz automática de selección de flujo`](references/decision-matrix.md)
-- [`Plantilla de registro de evidencia`](../../templates/evidence-record.yaml)
-- [`Plantilla de informe final`](../../templates/run-report.md)
-- [`Letterbox en ports Xenia/ReX`](../../docs/ports-recompilados-letterbox.md)
-- [README del proyecto](../../README.md)
+- [`Plantilla de registro de evidencia`](references/templates/evidence-record.yaml)
+- [`Plantilla de informe final`](references/templates/run-report.md)
+- [`Letterbox en ports Xenia/ReX`](references/ports-recompilados-letterbox.md)
+- [README del proyecto](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/README.md)
 - [Guía Android para apps fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
 - [Clases de tamaño de ventana Android](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes)
 - [Documentación oficial de Morphe Desktop](https://github.com/MorpheApp/morphe-desktop/blob/main/docs/documentation.md)

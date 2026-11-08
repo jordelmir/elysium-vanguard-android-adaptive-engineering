@@ -92,7 +92,7 @@ Un driver nombrado “Gen8”, “patched” o “Adreno” no determina compati
 | Flicker o corrupción temporal | carreras CPU/GPU, barreras, memoria, driver y shader | Que una única captura estable demuestre resolución |
 | Cuadro entero negro/crash | PID, transición de escena, swapchain, renderer, inicialización y logs/tombstone | Que “driver seleccionado” signifique inicializado o activo |
 
-Procedimiento, preflight estático del APK y límites del caso DOOM están en la [guía de diagnóstico gráfico](../../../docs/diagnostico-de-errores-graficos.md). La presencia de una biblioteca en el APK solo verifica el paquete; para una afirmación de carga, usa estado/log del mismo proceso. Compara una sola variable en un clon y conserva el driver/configuración que funcionaba. Una variante que arregla un modelo pero rompe suelo, puerta, arma u otra escena es una regresión, no una solución general.
+Procedimiento, preflight estático del APK y límites del caso DOOM están en la [guía de diagnóstico gráfico](diagnostico-de-errores-graficos.md). La presencia de una biblioteca en el APK solo verifica el paquete; para una afirmación de carga, usa estado/log del mismo proceso. Compara una sola variable en un clon y conserva el driver/configuración que funcionaba. Una variante que arregla un modelo pero rompe suelo, puerta, arma u otra escena es una regresión, no una solución general.
 
 ## Formatos de datos e instalación
 
@@ -105,6 +105,6 @@ Procedimiento, preflight estático del APK y límites del caso DOOM están en la
 ## Casos que deben abrirse antes de repetir
 
 - [Informe técnico y evidencia por título](case-study.md)
-- [Letterbox de Gears of War/Xenia-ReX](../../../docs/ports-recompilados-letterbox.md)
-- [Implementación de viewport en RE7](../../../docs/arquitectura-y-diagnostico.md)
+- [Letterbox de Gears of War/Xenia-ReX](ports-recompilados-letterbox.md)
+- [Implementación de viewport en RE7](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/arquitectura-y-diagnostico.md)
 - [Fuentes del port DOOM v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9)

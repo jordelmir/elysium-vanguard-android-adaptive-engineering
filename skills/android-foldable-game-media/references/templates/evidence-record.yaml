@@ -1,0 +1,76 @@
+# Plantilla local. Sustituye solo los campos necesarios. Guarda valores sensibles fuera de Git.
+schema_version: 2
+session:
+  date_utc: "YYYY-MM-DD"
+  objective: ""
+  user_scope: ""
+device:
+  model: ""
+  android_version: ""
+  soc_gpu: ""
+  posture_display: ""
+  display_id_local_only: ""
+  display_bounds_px: ""
+  refresh_hz_observed: ""
+target:
+  original_package: ""
+  clone_package: ""
+  app_version: ""
+  activity: ""
+  port_or_engine_version: ""
+architecture: "native | recompiler | emulator | container | video_player | unknown"
+baseline:
+  pid_alive: "yes | no | unknown"
+  activity_bounds_px: ""
+  surface_bounds_px: ""
+  game_or_video_frame_bounds_px: ""
+  observed_problem_layer: "android_window | surface | presenter | viewport | game_content | video_player | input | unknown"
+  graphics_symptom: "black_scene | black_models | missing_geometry | bad_texture_or_material | shader_error | flicker_or_corruption | other | unknown"
+  affected_objects_or_passes: []
+  reproduction_scene_and_camera: ""
+  screenshot_local_path: ""
+  screenshot_same_display: "yes | no | unknown"
+change:
+  source_or_config_path: ""
+  package_id_changed: false
+  variable_changed: ""
+  prior_value: ""
+  new_value: ""
+  rollback_path: ""
+driver:
+  package_archived: "yes | no | n/a"
+  imported_for_app: "yes | no | n/a"
+  selected: "yes | no | unknown | n/a"
+  loaded_same_process: "yes | no | unknown | n/a"
+  renderer_device_confirmed: "yes | no | unknown | n/a"
+  driver_log_same_process_path: ""
+fps:
+  configured_cap: ""
+  game_fps_instantaneous: ""
+  game_fps_window_seconds: ""
+  frame_generation_output: ""
+  panel_refresh_hz: ""
+  frametime_ms: ""
+  scene: ""
+verification:
+  installed: "yes | no | unknown"
+  cold_start: "yes | no | unknown"
+  gameplay_or_requested_player_reached: "yes | no | unknown"
+  full_panel_coverage: "yes | no | unknown"
+  crop_or_stretch: ""
+  touch_center: "pass | fail | not_tested"
+  touch_edges: "pass | fail | not_tested"
+  same_graphics_scene_before_after: "yes | no | unknown"
+  second_scene_regression_check: "pass | fail | not_tested"
+  graphics_result_user_reported: "yes | no"
+  final_graphics_screenshot_local_path: ""
+  crash_log_reviewed: "yes | no | unavailable"
+  user_confirmation: "yes | no"
+conclusion:
+  evidence_state: "configured | installed | started | reproduced | runtime_verified | user_reported | pending"
+  result: ""
+  limitations: []
+privacy_review:
+  no_apk_or_game_data_committed: true
+  no_signing_keys_or_secrets_committed: true
+  no_private_logs_or_screenshots_committed: true
