@@ -9,7 +9,7 @@ description: Use this skill whenever an AI is asked to install, launch, organize
 
 Resuelve problemas de inicio, pantalla, controles, gráficos y rendimiento en ports Android y aplicaciones de video sobre teléfonos plegables. Prioriza evidencia del dispositivo y cambios limitados a la app. No confundas un APK instalado con un juego funcional, una opción guardada con una función activa ni un video ampliado con una adaptación que conserva todo su contenido.
 
-Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`references/ports-recompilados-letterbox.md`](references/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código.
+Antes de tomar valores de cualquier caso, lee [`references/case-study.md`](references/case-study.md). Ese informe separa los datos comprobados de los reportes del usuario y de los casos cuyo resultado no quedó registrado. Para ports basados en Xenia/ReX, consulta también [`references/ports-recompilados-letterbox.md`](references/ports-recompilados-letterbox.md); sus cvars no se pueden trasladar a otro wrapper sin revisar el código. Si la ventana Android ya ocupa el panel y el letterbox se genera en un presenter Vulkan nativo, usa además [`references/dark-souls-remastered-magic-v2.md`](references/dark-souls-remastered-magic-v2.md) como caso de referencia; su flag es específico de ese title ID y no es una opción universal.
 
 ## Inicio automático para agentes
 
@@ -20,6 +20,7 @@ Primero clasifica el objetivo y abre solo las referencias pertinentes:
 | Señal del usuario | Ruta de trabajo | Evidencia mínima para cerrar |
 |---|---|---|
 | Franjas, recorte o imagen estirada | Medir display → ventana → superficie → viewport/cuadro; luego elegir `Fit`, `Cover`, `Stretch` o viewport/FOV | Misma escena capturada en el display correcto; anotar proporción, recorte/deformación e interacción táctil |
+| Ventana completa, pero presenter Vulkan letterboxea el cuadro | Inspeccionar el blit final, el rectángulo de destino y la transformación táctil que lo consume | Log/captura del mismo proceso; probar entrada física por separado y anotar deformación si se fuerza `Stretch` |
 | Cierre antes o al entrar al juego | Confirmar paquete, PID, actividad, transición de intro/menú y logs/tombstone antes de cambiar driver o datos | Arranque frío, escena de gameplay o causa de cierre identificada; no llamar crash a una secuencia de logos si el proceso sigue vivo |
 | Archivos de juego/ISO/PKG/OBB | Identificar port, formato real, ruta esperada, tamaño libre y estructura; inventariar antes de copiar | Recibo/log de importación y una ruta de arranque; conservar origen y saves |
 | Clon o APK parcheado | Confirmar paquete, versión, ABI, certificado y anclajes; cambiar package ID si va en paralelo | APK firmado/verificado, ambas apps instaladas según intención y el clon abierto |
@@ -115,6 +116,16 @@ Al cambiar el idioma, separa los textos del wrapper Android de los recursos del 
 - Si solo hay APK compilado, cualquier modificación nativa debe identificar el hash exacto de la biblioteca/build, preservar copia reversible y editar únicamente el valor que el análisis confirma. Los offsets de otra versión no son una receta.
 - Distingue llenar la superficie con `Stretch` de un viewport/FOV calculado para el panel. Este último requiere cambios propios del juego y verificación de gameplay, HUD y cinemáticas. El caso Gears y sus límites están en la guía enlazada arriba.
 - Comprueba título/menú y gameplay por separado. Al cambiar el viewport o transformar `Surface`, vuelve a probar los controles táctiles en el centro y cerca de los bordes.
+
+#### Presenter Vulkan nativo con ventana completa
+
+- Confirma en runtime que los bounds de la actividad y la superficie activa ocupan el display; una captura mezclada de varios displays o una resolución nominal no localiza el origen.
+- Inspecciona la función final de presentación: identifica el rectángulo de destino, el ajuste de aspecto y cualquier modo de fondo. Si usa `Fit` centrado, el letterbox puede estar enteramente dentro del presenter aunque Android ya entregue una superficie completa.
+- Si el objetivo prioriza llenar el panel y conservar el cuadro completo, un modo `Stretch` puede reemplazar el destino por la superficie entera. Declara la deformación; no lo llames viewport adaptativo ni FOV expandido.
+- Publica el mismo rectángulo normalizado al código de entrada táctil, si el port transforma toques según el cuadro visible. Esto alinea el cálculo, pero no reemplaza una prueba física de controles tras recompilar.
+- No dibujes una ampliación de fondo y el cuadro original superpuestos salvo que ese sea el modo elegido. La copia de fondo puede parecer contenido duplicado; captura la misma escena para comparar.
+- Acota el cambio a un perfil/title ID, conserva el APK original y actualiza solo el clon con la firma que ya usa. Usa el caso [Dark Souls Remastered en Magic V2](references/dark-souls-remastered-magic-v2.md) como guía, no como parche copiable.
+- Verifica el log del mismo proceso, la captura del display activo, menú y gameplay, tacto y cualquier fallback de driver por separado. La pantalla completa no demuestra FPS altos ni un driver personalizado activo.
 
 #### Si el juego nativo ya acepta una relación de aspecto
 
@@ -234,6 +245,7 @@ Adjunta el registro resumido con campos de [`references/templates/evidence-recor
 - [`Plantilla de registro de evidencia`](references/templates/evidence-record.yaml)
 - [`Plantilla de informe final`](references/templates/run-report.md)
 - [`Letterbox en ports Xenia/ReX`](references/ports-recompilados-letterbox.md)
+- [`Presenter Vulkan nativo: Dark Souls Remastered en Magic V2`](references/dark-souls-remastered-magic-v2.md)
 - [README del proyecto](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/README.md)
 - [Guía Android para apps fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
 - [Clases de tamaño de ventana Android](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes)

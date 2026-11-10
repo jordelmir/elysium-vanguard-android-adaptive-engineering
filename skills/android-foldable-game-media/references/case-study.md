@@ -2,8 +2,8 @@
 
 | Campo | Valor |
 |---|---|
-| Versión del informe | 1.3 |
-| Corte de evidencia | 2026-11-07 |
+| Versión del informe | 1.4 |
+| Corte de evidencia | 2026-11-10 |
 | Dispositivo de referencia | HONOR Magic V2, panel interior desplegado salvo que se indique otra cosa |
 | Repositorio | [`elysium-vanguard-android-adaptive-engineering`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering) |
 
@@ -11,7 +11,7 @@ Este es un informe técnico con estructura científica y pasos de reproducción.
 
 ## Resumen
 
-La primera edición reunió trabajos en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión incorpora *Gears of War* en un port Android derivado de Xenia, seguimientos de RE7 y *God of War III*, *BOTW Recompiled*, YouTube en segundo plano y DOOM Mobile v0.4.9. También registra el análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
+La primera edición reunió trabajos en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión incorpora *Gears of War* en un port Android derivado de Xenia, seguimientos de RE7 y *God of War III*, *BOTW Recompiled*, YouTube en segundo plano, DOOM Mobile y *Dark Souls: Remastered* en un presenter Vulkan nativo. También registra el análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
 
 El hallazgo geométrico principal es que “pantalla completa” depende de la ventana y superficie activas. En una lectura del clon de YouTube, la actividad ocupaba `2156×2344`, mientras que `SurfaceView` medía `2156×1212` (16:9). La app podía estar a pantalla completa y aun así conservar un video apaisado con bandas arriba y abajo. Para mostrar el video completo sin deformarlo, el modo debe conservar aspecto y aceptar espacio libre; para llenar el área con `zoom` se recorta el cuadro, y `stretch` lo deforma.
 
@@ -74,6 +74,7 @@ El recorte centrado en un juego también exige transformar las coordenadas táct
 | BOTW Recompiled | Se aprobó el diseño conceptual de 60 FPS base y 120 FPS de salida interpolada | El trabajo se pausó para priorizar adaptación de pantalla; integración LSFG y 120 FPS de salida no están verificados |
 | YouTube en segundo plano | Se eligió un clon compatible basado en RVX 21.30.216 para probar controles de reproducción | El usuario informó que no aparecían controles en notificaciones; no quedó demostrada la reproducción ni la corrección de fondo |
 | DOOM Mobile 0.4.9 | Clon con ratio nativo derivado de la ventana interior; captura de gameplay a `2344×2156` y confirmación del usuario de pantalla completa | La captura mostró 60 FPS de forma instantánea; no es promedio estable. Amaral quedó seleccionado/importado, pero renderer Vulkan activo no fue confirmado por log |
+| Dark Souls: Remastered | Cambio de destino Vulkan limitado al title ID; log del proceso y captura `2344×2156` muestran gameplay sin bandas ni imagen de fondo duplicada; el usuario confirmó pantalla completa | `Stretch` deforma el cuadro 16:9; rectángulo de input quedó alineado en código, pero no se validaron físicamente todos los controles; lectura cercana a 29 FPS puntual; driver personalizado hizo fallback al del sistema |
 | The Last of Us Remastered para Android | Se analizó el texto de una publicación que afirma instalar un launcher y seleccionar un PKG | No se inspeccionaron ni verificaron APK, PKG, enlace, formato, requisitos o instalación |
 
 ### Caso 1 — *Resident Evil 7*: APK adaptativo y perfil de rendimiento
@@ -226,6 +227,16 @@ El usuario compartió una publicación de redes sociales que afirma que el port 
 
 **Cómo repetir:** conserva original y saves; identifica APK, ABI, GPU, versión del port y escena exactos; usa [`diagnostico-de-errores-graficos.md`](diagnostico-de-errores-graficos.md); inspecciona estáticamente hooks y ABI antes de instalar; valida el driver por log del mismo proceso; cambia una sola variable en el clon; compara la misma escena y otra escena con suelo, puertas, armas y animaciones. El script local es preflight de paquete, no verificador de runtime. No publiques APK, driver, assets ni capturas protegidas.
 
+### Caso 17 — *Dark Souls: Remastered*: presenter Vulkan a pantalla completa
+
+**Arquitectura y alcance:** port Android nx2android, title ID `01004AB00A260000`, clon actualizado por separado en HONOR Magic V2 con el panel interior desplegado. La ventana activa de NativeActivity ya tenía bounds de `2344×2156`; el problema se encontraba en cómo el presenter Vulkan ajustaba el cuadro, no en una ventana Android reducida.
+
+**Diagnóstico y cambio:** el presenter recibía un cuadro de `1920×1080` y el modo normal lo centraba en la superficie, conservando el 16:9 y dejando barras. Se hizo que la build para este title ID estableciera el destino de blit al tamaño completo de la superficie. El mismo rectángulo se publicó mediante `vk_pic_set()` y lo consume el transformador táctil de `front_android.c`. La implementación conceptual y referencias al código upstream están en [`la guía especializada`](dark-souls-remastered-magic-v2.md). Una primera variante dibujaba además una copia ampliada debajo del cuadro original y se veía duplicada; se desactivó para la build final.
+
+**Resultado y evidencia:** el clon fue recompilado, firmado con la misma clave local del clon, actualizado en sitio y arrancó sin tocar el paquete original. El log del proceso dijo `full-window stretch enabled: source=1920x1080 target=2156x1983`; una captura explícita del display interior midió `2344×2156` y mostró la escena sin franjas ni fondo duplicado. El usuario confirmó que la pantalla completa funcionaba. No se guardaron capturas con el juego en Git.
+
+**Límites:** el resultado es `Stretch`, por lo que la imagen 16:9 se deforma al ratio casi cuadrado del panel; el cambio no amplía FOV ni genera contenido fuera del cuadro. Aunque el rectángulo de toque sigue el rectángulo de imagen en el código, no se hizo una prueba física de todos los botones después de la actualización. La lectura cercana a 29 FPS fue instantánea, no una serie sostenida. El log indicó que Turnip personalizado no cargó y que el port usó el driver del sistema; no se atribuye el éxito visual a V37/V38/Amaral. No se integró Lossless ni se cambió la meta de FPS/calidad en esta tarea.
+
 ### Seguimiento de *Resident Evil 7*: hangs, driver y límites
 
 El perfil histórico RE7 de este informe registraba V38 y un límite configurado de 70. Después se reportaron nuevos estados colgados; el usuario pidió probar el driver Adreno 27 R1, limitar a 120 FPS y mantener una configuración de pantalla de 120 Hz mediante un script de inicio de Termux. También solicitó acceso a todos los núcleos de CPU. El registro del proyecto no contiene el script final, una lectura posterior de `dumpsys display`, el log del renderer asociado al proceso ni una sesión comparativa que demuestre 120 FPS sostenidos o estabilidad. Por ello, conserva el caso V38/70 como histórico y trata 27 R1/120/core policy como experimento posterior que debe volver a identificarse y verificarse antes de reutilizarlo.
@@ -307,3 +318,5 @@ Los resultados son de un solo dispositivo y aplicaciones/builds específicos. No
 6. Xenia Canary, [opciones de presentación](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing) y [patches oficiales de relación de aspecto para Gears of War](https://github.com/xenia-canary/game-patches/blob/main/patches/4D5307D5%20-%20Gears%20of%20War.patch.toml).
 7. zFitness, [gow3_android](https://github.com/zFitness/gow3_android), proyecto upstream indicado por el usuario para el port de *God of War III*.
 8. Desm0nt, [port Android de DOOM](https://github.com/Desm0nt/doom-port), [fuente v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9) y [guía de instalación de ese tag](https://github.com/Desm0nt/doom-port/blob/v0.4.9/docs/INSTALL.md).
+9. Shirai91, [nx2android presenter Vulkan en el commit examinado](https://github.com/shirai91/nx2android/tree/e9bd2b764608facf841e39292d868ee657eaf634), enlazado solo como referencia externa; revisa la licencia upstream antes de reutilizar código.
+10. Android Developers, [cambios de comportamiento de Android 16 en pantallas grandes](https://developer.android.com/about/versions/16/behavior-changes-16).

@@ -18,6 +18,7 @@ Esta referencia permite que un agente elija la capa de inspección antes de modi
 |---|---|---|---|---|
 | Juego Android nativo con código | `Activity`, `WindowMetrics`, `SurfaceView`, parser de ratio, renderer y coordenadas de input | Preferencia de ratio/viewport derivada de la ventana activa | Gameplay renderiza al ratio solicitado; HUD y controles probados | Fijar `wm size` del sistema o modificar flags sin medir superficie |
 | Recompilación estática / HLE | README y tag de fuente, tamaño de ventana comunicado a HLE, cvars/aspect parser, FOV virtual y escala de HUD | Ratio de salida soportado por esa build; rebuild del wrapper si Auto tiene límites inadecuados | Log del parser más captura de inicio y gameplay en el display correcto | Suponer que la resolución interna 720p es la resolución física final |
+| Presenter Vulkan nativo con letterbox | Bounds de ventana/superficie, rectángulo del blit final, cálculo de aspecto y rectángulo consumido por input | Preferencia por título entre `Fit`, `Cover`, `Stretch` o viewport del motor | Log del mismo proceso, captura del display activo y prueba táctil tras el cambio | Cambiar immersive flags aunque la ventana ya esté completa; estirar y llamarlo FOV adaptado; apilar una copia de fondo |
 | Presenter Xenia/ReX | Defaults del cvar, parser exacto del wrapper, presenter y configuración efectiva | Opción/cvar del presenter; patch de viewport/FOV separado si existe | Cuadro ocupa el destino; clasificación explícita como Fit/Cover/Stretch/FOV; input probado | Copiar variables `XPORT_*` o offsets de otra build |
 | Port Windows/Linux en contenedor | Resolución del contenedor, `ANativeWindow`, Surface, escalador del contenedor, DXVK/VKD3D y mapa táctil | Cambio de viewport/transformación por versión del contenedor | Misma escena, menú y gameplay; logs DXVK/renderer y entrada coincidente | Llamar “Android nativo” al binario Windows o asumir que subir la resolución da más FPS |
 | Emulador | Resolución de emulación, modo docked/handheld, cvars del core, backend y escalado de superficie | Configuración específica del core y perfil por juego | Juego renderizado y HUD a escala correcta en la versión actual del core | Aplicar “máximo rendimiento” o drivers de otro emulador |
@@ -106,5 +107,6 @@ Procedimiento, preflight estático del APK y límites del caso DOOM están en la
 
 - [Informe técnico y evidencia por título](case-study.md)
 - [Letterbox de Gears of War/Xenia-ReX](ports-recompilados-letterbox.md)
+- [Presenter Vulkan nativo de Dark Souls Remastered](dark-souls-remastered-magic-v2.md)
 - [Implementación de viewport en RE7](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/docs/arquitectura-y-diagnostico.md)
 - [Fuentes del port DOOM v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9)
