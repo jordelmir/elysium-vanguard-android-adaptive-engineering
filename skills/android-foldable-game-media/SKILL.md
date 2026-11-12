@@ -20,6 +20,7 @@ Primero clasifica el objetivo y abre solo las referencias pertinentes:
 | Señal del usuario | Ruta de trabajo | Evidencia mínima para cerrar |
 |---|---|---|
 | Franjas, recorte o imagen estirada | Medir display → ventana → superficie → viewport/cuadro; luego elegir `Fit`, `Cover`, `Stretch` o viewport/FOV | Misma escena capturada en el display correcto; anotar proporción, recorte/deformación e interacción táctil |
+| Franjas en un emulador PS2 Android | Seguir el [runbook de aspecto PS2](references/ps2-emulator-aspect-ratio.md); separar ventana Android, superficie y cuadro GS; identificar build y ámbito del perfil | Valor efectivo leído tras cold start y captura del display correcto; clasificar `Fit`/`Stretch`, recorte, deformación, persistencia y tacto |
 | Ventana completa, pero presenter Vulkan letterboxea el cuadro | Inspeccionar el blit final, el rectángulo de destino y la transformación táctil que lo consume | Log/captura del mismo proceso; probar entrada física por separado y anotar deformación si se fuerza `Stretch` |
 | Cierre antes o al entrar al juego | Confirmar paquete, PID, actividad, transición de intro/menú y logs/tombstone antes de cambiar driver o datos | Arranque frío, escena de gameplay o causa de cierre identificada; no llamar crash a una secuencia de logos si el proceso sigue vivo |
 | Archivos de juego/ISO/PKG/OBB | Identificar port, formato real, ruta esperada, tamaño libre y estructura; inventariar antes de copiar | Recibo/log de importación y una ruta de arranque; conservar origen y saves |
@@ -99,6 +100,20 @@ Una pantalla puede llenar todo el área disponible, pero una imagen con relació
 Para videos, deja `Fit` como opción que preserva toda la imagen. Ofrece `Zoom` o `Stretch` como selección explícita del usuario. El botón de escala de Anddea recorre `Default`, `Stretch` y `Zoom`; no lo describas como “sin pérdida” cuando el modo recorta o deforma. Verifica si el control solo opera en pantalla completa antes de prometer efecto en Shorts, miniplayer, videos incrustados o feed.
 
 Para juegos, conserva proporción si la cámara/viewport no admite otra. Si se aplica `cover`, transforma también la entrada táctil de forma inversa para que las coordenadas del juego sigan los controles visibles. Nunca cambies el tamaño global del sistema para corregir solo una app.
+
+#### Emuladores PS2 Android (ARMSX2 y derivados)
+
+Las franjas pueden venir del ajuste de aspecto de la GS del emulador aunque la actividad y su superficie ya cubran el panel. Sigue [`ps2-emulator-aspect-ratio.md`](references/ps2-emulator-aspect-ratio.md) antes de editar preferencias:
+
+1. Identifica el paquete y build instalados; no infieras la versión del emulador por el nombre o arte del wrapper. Comprueba el ID del disco del juego y qué display interior está activo.
+2. Mide ventana, `SurfaceView` y cuadro renderizado por separado. Si la ventana ya es del tamaño completo, no cambies `wm size`, densidad ni flags de inmersión para corregir barras dibujadas por el renderer.
+3. Abre primero los ajustes de aspecto del emulador. Si el wrapper los oculta, consulta el código o formato de configuración de la misma versión y confirma si el ajuste es global o por juego. Nunca copies índices de enum, nombres de claves o rutas desde otra versión sin verificarlos.
+4. Elige entre conservar geometría (`Fit`/Auto, con bandas), ocupar el panel sin recorte (`Stretch`, con deformación) o usar un viewport/cámara que genere la relación objetivo. No presentes `Stretch` como FOV adaptado.
+5. Si necesitas editar una preferencia privada, respalda el archivo, cambia una sola clave, registra el valor anterior/nuevo y usa `run-as` solo si el paquete es depurable. Si `run-as` no está disponible, vuelve al ajuste soportado o prepara un clon de prueba; no escales a root.
+6. Reinicia solo desde un menú o estado guardado seguro. Confirma que la clave persiste después del cold start y captura la misma escena en el display correcto. La captura debe mostrar el cuadro completo; una lectura de configuración sola no basta.
+7. Prueba entrada/tacto aparte. Una superficie estirada puede ocupar el panel y aun así dejar desalineados los controles. Registra también cuando no se haya probado gameplay interactivo.
+
+El [caso 18 de God of War II](references/case-study.md#caso-18--god-of-war-ii-en-armsx2catonix-aspect-ratio-en-pantalla-interior) documenta una ejecución real en `com.catonix.gow2`: el emulador estaba en Auto 4:3 y el perfil pasó a Stretch. El resultado llenó `2344×2156` sin recorte visible, pero deformó la imagen. El índice/configuración y tamaño de pantalla son propios de esa build; otras apps, juegos y versiones deben medirse de nuevo. El caso no probó tacto y el informe registra la discrepancia del espejo JSON externo.
 
 ### 5. Averigua qué tipo de port estás tratando
 
@@ -246,6 +261,9 @@ Adjunta el registro resumido con campos de [`references/templates/evidence-recor
 - [`Plantilla de informe final`](references/templates/run-report.md)
 - [`Letterbox en ports Xenia/ReX`](references/ports-recompilados-letterbox.md)
 - [`Presenter Vulkan nativo: Dark Souls Remastered en Magic V2`](references/dark-souls-remastered-magic-v2.md)
+- [`Relación de aspecto en emuladores PS2 Android`](references/ps2-emulator-aspect-ratio.md)
+- [`Caso de God of War II en ARMSX2/Catonix`](references/case-study.md#caso-18--god-of-war-ii-en-armsx2catonix-aspect-ratio-en-pantalla-interior)
+- [Informe científico completo del caso](../../docs/god-of-war-ii-armsx2-magic-v2.md)
 - [README del proyecto](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering/blob/main/README.md)
 - [Guía Android para apps fold-aware](https://developer.android.com/develop/adaptive-apps/guides/foldables/make-your-app-fold-aware)
 - [Clases de tamaño de ventana Android](https://developer.android.com/develop/adaptive-apps/guides/use-window-size-classes)

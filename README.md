@@ -2,13 +2,14 @@
 
 Métodos reproducibles para diagnosticar y adaptar juegos, ports y reproductores de video en Android plegables. El equipo de referencia es el HONOR Magic V2, con prioridad en el panel interior desplegado.
 
-El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, *Gears of War* en un port Android derivado de Xenia, *God of War III*, *Zelda: Breath of the Wild Recompiled*, DOOM Mobile, *Dark Souls: Remastered* en un presenter Vulkan nativo, clones de YouTube, un análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android y tareas de USB/almacenamiento. Distingue entre cambios configurados, APKs instalados, comportamiento medido y resultados reportados por el usuario.
+El repositorio reúne casos de *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, *Gears of War* en un port Android derivado de Xenia, *God of War II* en un wrapper ARMSX2/Catonix, *God of War III*, *Zelda: Breath of the Wild Recompiled*, DOOM Mobile, *Dark Souls: Remastered* en un presenter Vulkan nativo, clones de YouTube, un análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android y tareas de USB/almacenamiento. Distingue entre cambios configurados, APKs instalados, comportamiento medido y resultados reportados por el usuario.
 
 ## Qué contiene
 
 - Un método de diagnóstico por capas para actividad, ventana, superficie, viewport, controles y contenido.
 - Un enrutador para agentes de IA que selecciona el flujo correcto según arquitectura y síntoma, con un registro estructurado de evidencia y puertas explícitas para considerar un caso terminado.
 - Una guía específica para puertos recompilados que colocan el letterbox dentro del presentador nativo, incluido el significado real de `present_letterbox=false`.
+- Un procedimiento versionado para diagnosticar barras en emuladores PS2 Android y elegir el ajuste de aspecto con su alcance, persistencia y costo geométrico.
 - Un caso de presenter Vulkan nativo que limita `Stretch` a un title ID, sincroniza el rectángulo táctil con el blit y distingue la pantalla completa de FOV, driver activo y FPS sostenidos.
 - Procedimientos para crear clones Android firmados por separado, importar datos propios y preservar la app original.
 - Guías para mapear entrada táctil después de un cambio de escala o recorte.
@@ -38,6 +39,8 @@ La adaptación de escala siempre tiene un costo cuando la imagen y el panel tien
 - [Plantilla de informe de sesión](templates/run-report.md)
 - [Guía de letterbox en ports Xenia/ReX](docs/ports-recompilados-letterbox.md)
 - [Caso de Dark Souls Remastered en el presenter Vulkan del Magic V2](docs/dark-souls-remastered-magic-v2.md)
+- [Caso de God of War II en ARMSX2/Catonix](docs/god-of-war-ii-armsx2-magic-v2.md)
+- [Runbook de aspecto para emuladores PS2 Android](skills/android-foldable-game-media/references/ps2-emulator-aspect-ratio.md)
 - [Caso técnico DOOM Mobile en Magic V2](docs/doom-mobile-magic-v2.md)
 - [Diagnóstico reproducible de errores gráficos](docs/diagnostico-de-errores-graficos.md)
 - [Auditor estático de renderer/hooks en APK](tools/audit_android_renderer_apk.py)

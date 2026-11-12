@@ -25,6 +25,8 @@ REA complementa ADB; no reemplaza ni administra el transporte del dispositivo. S
 - [Halo 2 Android port indicado por el usuario](https://github.com/Ayanokoji989/Halo-2)
 - [zFitness: port gow3_android](https://github.com/zFitness/gow3_android)
 - [Desm0nt: DOOM port Android](https://github.com/Desm0nt/doom-port), [tag v0.4.9](https://github.com/Desm0nt/doom-port/tree/v0.4.9) y [guía de instalación v0.4.9](https://github.com/Desm0nt/doom-port/blob/v0.4.9/docs/INSTALL.md)
+- [ARMSX2: enum del ajuste de aspecto en Settings.kt](https://github.com/ARMSX2/ARMSX2/blob/c25493a20285dc126a950d2d61826987a566a306/platforms/android/app/src/main/java/com/armsx2/config/Settings.kt#L587-L596) y [precedencia de SharedPreferences frente al espejo JSON](https://github.com/ARMSX2/ARMSX2/blob/c25493a20285dc126a950d2d61826987a566a306/platforms/android/app/src/main/java/com/armsx2/config/ConfigStore.kt#L326-L334). Corresponden al commit fuente `c25493a`; comprueba que la build investigada use el mismo esquema antes de reutilizar índices.
+- [ARMSX2 2.6.6.1: modos de aspecto y relación personalizada](https://armsx2.net/updates/2.6.6.1). Las notas describen una versión distinta de la build Catonix observada; no sustituyen la inspección de su paquete.
 - [Registro upstream de fallas gráficas de DOOM, commit v0.4.18-test1](https://github.com/Desm0nt/doom-port/blob/085d0cb0b3796ddbfa33c64b6d00776387ad4eba/docs/doom/BUGS_AND_FIXES.md) y [código de esa revisión](https://github.com/Desm0nt/doom-port/tree/085d0cb0b3796ddbfa33c64b6d00776387ad4eba)
 - [Vulkan Guide: robustez de memoria](https://docs.vulkan.org/guide/latest/robustness.html)
 - [Xenia Canary: opciones de presentación](https://github.com/xenia-canary/xenia-canary/wiki/Options#black-bars-letterboxingpillarboxing)

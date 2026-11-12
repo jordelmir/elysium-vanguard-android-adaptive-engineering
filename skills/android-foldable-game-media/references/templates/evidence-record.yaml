@@ -1,5 +1,5 @@
 # Plantilla local. Sustituye solo los campos necesarios. Guarda valores sensibles fuera de Git.
-schema_version: 2
+schema_version: 3
 session:
   date_utc: "YYYY-MM-DD"
   objective: ""
@@ -37,6 +37,14 @@ change:
   prior_value: ""
   new_value: ""
   rollback_path: ""
+aspect_ratio:
+  source_ratio: ""
+  destination_ratio: ""
+  mode: "fit | cover | stretch | game_viewport | unknown"
+  setting_scope: "per_game | global_app | system | unknown"
+  crop_observed: "yes | no | unknown"
+  distortion_expected_or_observed: ""
+  cold_start_persisted: "yes | no | unknown"
 driver:
   package_archived: "yes | no | n/a"
   imported_for_app: "yes | no | n/a"

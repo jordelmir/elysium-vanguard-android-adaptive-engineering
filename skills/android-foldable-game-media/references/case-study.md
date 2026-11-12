@@ -2,8 +2,8 @@
 
 | Campo | Valor |
 |---|---|
-| Versión del informe | 1.4 |
-| Corte de evidencia | 2026-11-10 |
+| Versión del informe | 1.5 |
+| Corte de evidencia | 2026-11-12 |
 | Dispositivo de referencia | HONOR Magic V2, panel interior desplegado salvo que se indique otra cosa |
 | Repositorio | [`elysium-vanguard-android-adaptive-engineering`](https://github.com/jordelmir/elysium-vanguard-android-adaptive-engineering) |
 
@@ -11,7 +11,7 @@ Este es un informe técnico con estructura científica y pasos de reproducción.
 
 ## Resumen
 
-La primera edición reunió trabajos en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión incorpora *Gears of War* en un port Android derivado de Xenia, seguimientos de RE7 y *God of War III*, *BOTW Recompiled*, YouTube en segundo plano, DOOM Mobile y *Dark Souls: Remastered* en un presenter Vulkan nativo. También registra el análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
+La primera edición reunió trabajos en un HONOR Magic V2: *Resident Evil 7*, *Halo 2*, *Sekiro*, *Left 4 Dead 2*, *Need for Speed: Most Wanted* (2012), *Just Cause 2*, *PES 6*, un clon de YouTube y tareas de USB/almacenamiento con *PES 2017* y *Zelda: Breath of the Wild*. Esta revisión incorpora *Gears of War* en un port Android derivado de Xenia, seguimientos de RE7 y *God of War III*, *BOTW Recompiled*, YouTube en segundo plano, DOOM Mobile, *Dark Souls: Remastered* en un presenter Vulkan nativo y *God of War II* en un wrapper ARMSX2/Catonix. También registra el análisis no verificado de una publicación sobre *The Last of Us Remastered* para Android. El informe conserva resultados de distinta fuerza: configuración, instalación, ejecución, medición y reportes del usuario se etiquetan por separado.
 
 El hallazgo geométrico principal es que “pantalla completa” depende de la ventana y superficie activas. En una lectura del clon de YouTube, la actividad ocupaba `2156×2344`, mientras que `SurfaceView` medía `2156×1212` (16:9). La app podía estar a pantalla completa y aun así conservar un video apaisado con bandas arriba y abajo. Para mostrar el video completo sin deformarlo, el modo debe conservar aspecto y aceptar espacio libre; para llenar el área con `zoom` se recorta el cuadro, y `stretch` lo deforma.
 
@@ -75,6 +75,7 @@ El recorte centrado en un juego también exige transformar las coordenadas táct
 | YouTube en segundo plano | Se eligió un clon compatible basado en RVX 21.30.216 para probar controles de reproducción | El usuario informó que no aparecían controles en notificaciones; no quedó demostrada la reproducción ni la corrección de fondo |
 | DOOM Mobile 0.4.9 | Clon con ratio nativo derivado de la ventana interior; captura de gameplay a `2344×2156` y confirmación del usuario de pantalla completa | La captura mostró 60 FPS de forma instantánea; no es promedio estable. Amaral quedó seleccionado/importado, pero renderer Vulkan activo no fue confirmado por log |
 | Dark Souls: Remastered | Cambio de destino Vulkan limitado al title ID; log del proceso y captura `2344×2156` muestran gameplay sin bandas ni imagen de fondo duplicada; el usuario confirmó pantalla completa | `Stretch` deforma el cuadro 16:9; rectángulo de input quedó alineado en código, pero no se validaron físicamente todos los controles; lectura cercana a 29 FPS puntual; driver personalizado hizo fallback al del sistema |
+| God of War II (ARMSX2/Catonix) | Preferencia `config.global.aspectRatio` cambió de `1` a `0`, persistió tras cold start y una captura del panel interior mostró el juego llenando `2344×2156`; el usuario confirmó el resultado | `Stretch` deforma el cuadro 4:3 (~22.6 % de escala vertical frente a Fit); captura final y baseline no fueron la misma escena; tacto y restauración desde el espejo externo no probados |
 | The Last of Us Remastered para Android | Se analizó el texto de una publicación que afirma instalar un launcher y seleccionar un PKG | No se inspeccionaron ni verificaron APK, PKG, enlace, formato, requisitos o instalación |
 
 ### Caso 1 — *Resident Evil 7*: APK adaptativo y perfil de rendimiento
@@ -236,6 +237,20 @@ El usuario compartió una publicación de redes sociales que afirma que el port 
 **Resultado y evidencia:** el clon fue recompilado, firmado con la misma clave local del clon, actualizado en sitio y arrancó sin tocar el paquete original. El log del proceso dijo `full-window stretch enabled: source=1920x1080 target=2156x1983`; una captura explícita del display interior midió `2344×2156` y mostró la escena sin franjas ni fondo duplicado. El usuario confirmó que la pantalla completa funcionaba. No se guardaron capturas con el juego en Git.
 
 **Límites:** el resultado es `Stretch`, por lo que la imagen 16:9 se deforma al ratio casi cuadrado del panel; el cambio no amplía FOV ni genera contenido fuera del cuadro. Aunque el rectángulo de toque sigue el rectángulo de imagen en el código, no se hizo una prueba física de todos los botones después de la actualización. La lectura cercana a 29 FPS fue instantánea, no una serie sostenida. El log indicó que Turnip personalizado no cargó y que el port usó el driver del sistema; no se atribuye el éxito visual a V37/V38/Amaral. No se integró Lossless ni se cambió la meta de FPS/calidad en esta tarea.
+
+### Caso 18 — *God of War II* en ARMSX2/Catonix: aspect ratio en pantalla interior
+
+**Pregunta:** ¿las franjas las producía la ventana Android o el modo de aspecto del emulador PS2?
+
+**Entorno y método:** HONOR Magic V2 con Android 16, panel interior desplegado en horizontal (`2344×2156`); paquete `com.catonix.gow2`, actividad `com.armsx2.Main`, versión `1.0.0`/`1088`, target SDK 37 y build marcada depurable. El juego era *God of War II*, disco `SCUS-97481 NTSC-U`. La ventana ya ocupaba el panel; la preferencia interna `shared_prefs/ARMSX2.xml` guardaba un JSON bajo `config.global`. Se respaldó el archivo y se cambió solo `aspectRatio`, de `1` (Auto/4:3 observado) a `0` (Stretch en esta build). El ámbito resultó global para la app; no se encontró una preferencia específica del juego en la ruta revisada.
+
+**Predicción geométrica:** `2344/2156 ≈ 1.0872` frente al cuadro 4:3 (`1.3333`). Ajustar 4:3 al ancho produce `2344×1758`, lo que deja `398` píxeles libres verticales (`~199` por borde si centrado). Estirar a `2344×2156` escala X por `1.0` y Y por `2156/1758 ≈ 1.2264`, es decir, `~22.6 %` de extensión vertical respecto a Fit.
+
+**Resultado:** después de un cold start, la preferencia interna siguió en `0`. Una captura local explícita del display interior a `2344×2156` mostró el juego cubriendo la pantalla; el usuario confirmó que quedó. No se guardó la captura en Git. La salida no mostró recorte visible, pero sí corresponde a `Stretch`; no es un FOV más ancho ni conserva la geometría 4:3.
+
+**Calidad de evidencia y límites:** se leyó configuración antes/después, se comprobó un arranque frío, se revisó una captura final y existe confirmación del usuario. Baseline y captura final no eran exactamente la misma escena tras reiniciar el launcher, por lo que no es A/B fotométrico de cuadro idéntico. No se probó el tacto, FPS, driver o rendimiento. El espejo externo `/storage/emulated/0/Android/data/com.catonix.gow2/files/armsx2-settings.json` aún mostraba `aspectRatio=1`; se observó la preferencia interna como primaria y no se probó pérdida/recuperación del archivo, borrado de datos o reinstalación. El APK era un wrapper personalizado y no quedó establecida su procedencia binaria exacta desde upstream.
+
+**Reproducción y rollback:** consulta el [informe científico detallado](../../../docs/god-of-war-ii-armsx2-magic-v2.md) y el [runbook de aspecto PS2](ps2-emulator-aspect-ratio.md). Respalda el XML; usa primero la UI y verifica el esquema de la build; cambia solo el campo; arranca en frío; captura la misma escena; verifica tacto por separado. Restaura el respaldo o elige Auto/4:3 si la deformación no es aceptable. No reutilices índices ni rutas sin comprobarlos.
 
 ### Seguimiento de *Resident Evil 7*: hangs, driver y límites
 
